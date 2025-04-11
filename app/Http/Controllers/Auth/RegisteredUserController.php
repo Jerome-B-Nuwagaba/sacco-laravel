@@ -40,6 +40,7 @@ class RegisteredUserController extends Controller
         'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
         'password' => ['required', 'confirmed', Rules\Password::defaults()],
         'role' => ['required', 'in:admin,loan_officer,customer'],
+        'company_id' => ['required', 'exists:companies,id'], 
     ]);
 
     $user = User::create([
@@ -47,12 +48,23 @@ class RegisteredUserController extends Controller
         'email' => $request->email,
         'password' => Hash::make($request->password),
         'role' => $request->role,
+        'company_id' => $request->company_id,
     ]);
 
     event(new Registered($user));
 
     Auth::login($user);
 
-    return redirect(RouteServiceProvider::HOME);
+   // Role-based redirection
+   switch ($user->role) {
+    case 'admin':
+        return redirect()->route('admin.dashboard');
+    case 'loan_officer':
+        return redirect()->route('loanofficer.dashboard');
+    case 'customer':
+        return redirect()->route('customer.dashboard');
+    default:
+        return redirect('/');
+}
 }
 }

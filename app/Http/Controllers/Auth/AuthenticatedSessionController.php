@@ -28,7 +28,18 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $user = auth()->user();
+
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->role === 'loan_officer') {
+            return redirect()->route('loan_officer.dashboard');
+        } elseif ($user->role === 'customer') {
+            return redirect()->route('customer.dashboard');
+        } else {
+            auth()->logout(); // Optional: force logout if role is undefined
+            return redirect()->route('login')->withErrors(['role' => 'Unauthorized role']);
+        }
     }
 
     /**
