@@ -17,6 +17,11 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+
+     const ROLE_ADMIN = 'admin';
+    const ROLE_LOAN_OFFICER = 'loan-officer';
+    const ROLE_CUSTOMER = 'customer';
+    
     protected $fillable = [
         'name',
         'email',
@@ -48,4 +53,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function company()
+{
+    return $this->belongsTo(Company::class);
+}
 }

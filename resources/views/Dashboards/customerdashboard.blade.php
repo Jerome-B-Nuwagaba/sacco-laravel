@@ -19,7 +19,7 @@
                 <select name="loan_type_id" id="loan_type_id" class="w-full border-gray-300 rounded-md mt-1" required>
                     <option value="">Select Loan Type</option>
                     @foreach ($loanTypes as $loanType)
-                     <option value="{{ $loanType->id }}">{{ $loanType->name }}</option>
+                        <option value="{{ $loanType->id }}">{{ $loanType->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -27,8 +27,6 @@
             <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Apply</button>
         </form>
     </div>
-
-            
 
     <!-- Active Loans / Payment -->
     <div class="mb-8">
