@@ -37,7 +37,7 @@ class ConfirmablePasswordController extends Controller
 
         $redirectRoutes = [
             'admin' => 'admin.dashboard',
-            'loan_officer' => 'loan-officer.dashboard',
+            'loan_officer' => 'loan_officer.dashboard',
             'customer' => 'customer.dashboard',
         ];
     

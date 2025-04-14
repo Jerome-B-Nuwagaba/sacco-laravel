@@ -19,7 +19,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
-    Route::get('/loan-officer/dashboard', [LoanOfficerController::class, 'index'])->name('loan-officer.dashboard');
+    Route::get('/loan_officer/dashboard', [LoanOfficerController::class, 'index'])->name('loanofficer.dashboard');
     Route::get('/customer/dashboard', [CustomerController::class, 'index'])->name('customerdashboard.dashboards');
 
 });
@@ -42,7 +42,7 @@ Route::prefix('customer')->middleware('auth')->group(function () {
     Route::post('/payment-plans/{id}/accept', [CustomerController::class, 'acceptPaymentPlan'])->name('customer.payment-plans.accept');
 });
 
-Route::prefix('loan-officer')->middleware('auth')->group(function () {
+Route::prefix('loan_officer')->middleware('auth')->group(function () {
     Route::get('/dashboard', [LoanOfficerController::class, 'index'])->name('loan_officer.dashboard');    
     Route::get('/customers', [LoanOfficerController::class, 'customers'])->name('loan_officer.customers.index');    
     Route::get('/loans/pending', [LoanOfficerController::class, 'reviewLoans'])->name('loan_officer.loans.pending');

@@ -8,19 +8,19 @@ class LoanOfficerController extends Controller
 {
     public function index()
     {
-        return view('loan-officer.dashboard');
+        return view('loan_officer.dashboard');
     }
 
     public function customers()
 {
     $customers = \App\Models\User::where('role', 'customer')->get();
-    return view('loan-officer.customers', compact('customers'));
+    return view('loan_officer.customers', compact('customers'));
 }
 
 public function reviewLoans()
 {
     $loans = \App\Models\Loan::where('status', 'pending')->get();
-    return view('loan-officer.review-loans', compact('loans'));
+    return view('loan_officer.review-loans', compact('loans'));
 }
 
 public function updateLoanStatus($loanId, Request $request)
@@ -39,13 +39,13 @@ public function updateLoanStatus($loanId, Request $request)
 public function paidLoans()
 {
     $loans = \App\Models\Loan::where('status', 'paid')->get();
-    return view('loan-officer.paid-loans', compact('loans'));
+    return view('loan_officer.paid-loans', compact('loans'));
 }
 
 public function createPaymentPlan($loanId)
 {
     $loan = \App\Models\Loan::findOrFail($loanId);
-    return view('loan-officer.create-payment-plan', compact('loan'));
+    return view('loan_officer.create-payment-plan', compact('loan'));
 }
 
 public function storePaymentPlan(Request $request)
@@ -64,6 +64,6 @@ public function storePaymentPlan(Request $request)
         'completion_date' => $request->completion_date,
     ]);
 
-    return redirect()->route('loan-officer.dashboard')->with('success', 'Payment plan created.');
+    return redirect()->route('loan_officer.dashboard')->with('success', 'Payment plan created.');
 }
 }

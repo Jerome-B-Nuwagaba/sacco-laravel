@@ -13,7 +13,7 @@
                 <p><strong>Email:</strong> {{ $customer->email }}</p>
                 <p><strong>Company:</strong> {{ $customer->company->name }}</p>
 
-                <a href="{{ route('loan-officer.loans.review', $customer->id) }}" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Review Loans</a>
+                <a href="{{ route('loan_officer.loans.review', $customer->id) }}" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Review Loans</a>
             </div>
         @empty
             <p>No customers registered yet.</p>
@@ -30,13 +30,13 @@
                 <p><strong>Loan Type:</strong> {{ $loan->loanType->name }}</p>
 
                 <!-- Accept Loan -->
-                <form action="{{ route('loan-officer.loans.accept', $loan->id) }}" method="POST" class="inline-block mr-2">
+                <form action="{{ route('loan_officer.loans.accept', $loan->id) }}" method="POST" class="inline-block mr-2">
                     @csrf
                     <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Accept Loan</button>
                 </form>
 
                 <!-- Decline Loan -->
-                <form action="{{ route('loan-officer.loans.decline', $loan->id) }}" method="POST" class="inline-block">
+                <form action="{{ route('loan_officer.loans.decline', $loan->id) }}" method="POST" class="inline-block">
                     @csrf
                     <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Decline Loan</button>
                 </form>
@@ -63,7 +63,7 @@
     <!-- Create Payment Plan -->
     <div>
         <h2 class="text-xl font-semibold mb-2">Create Payment Plan</h2>
-        <form action="{{ route('loan-officer.payment-plans.create') }}" method="POST" class="bg-white p-4 rounded shadow">
+        <form action="{{ route('loan_officer.payment-plans.create') }}" method="POST" class="bg-white p-4 rounded shadow">
             @csrf
             <div class="mb-4">
                 <label for="loan_id" class="block font-medium">Select Loan</label>

@@ -19,7 +19,7 @@ class User extends Authenticatable
      */
 
      const ROLE_ADMIN = 'admin';
-    const ROLE_LOAN_OFFICER = 'loan-officer';
+    const ROLE_LOAN_OFFICER = 'loan_officer';
     const ROLE_CUSTOMER = 'customer';
     
     protected $fillable = [
