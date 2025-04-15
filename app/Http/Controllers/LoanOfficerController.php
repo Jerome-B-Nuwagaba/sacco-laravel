@@ -32,7 +32,7 @@ public function reviewLoans()
 public function updateLoanStatus($loanId, Request $request)
 {
     $request->validate([
-        'action' => 'required|in:accepted,declined,forwarded',
+        'action' => 'required|in:declined,forwarded',
     ]);
 
     $loan = \App\Models\Loan::findOrFail($loanId);

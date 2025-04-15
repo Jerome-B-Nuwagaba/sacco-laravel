@@ -49,7 +49,14 @@ public function approveLoan($loanId)
 
     return redirect()->back()->with('success', 'Loan approved.');
 }
+public function rejectLoan($loanId)
+{
+    $loan = Loan::findOrFail($loanId);
+    $loan->status = 'rejected';
+    $loan->save();
 
+    return redirect()->back()->with('success', 'Loan rejected.');
+}
 public function createLoanType()
 {
     return view('admin.create-loan-type');
@@ -68,10 +75,16 @@ public function storeLoanType(Request $request)
 
 public function analytics()
 {
-    $daily = \App\Models\Loan::whereDate('created_at', today())->count();
-    $weekly = \App\Models\Loan::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count();
-    $monthly = \App\Models\Loan::whereMonth('created_at', now()->month)->count();
+    $analytics = [
+        'daily' => \App\Models\Loan::whereDate('created_at', today())->count(),
+        'weekly' => \App\Models\Loan::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+        'monthly' => \App\Models\Loan::whereMonth('created_at', now()->month)->count(),
+        'users' => \App\Models\User::count(),
+        'pending' => \App\Models\Loan::where('status', 'pending')->count(),
+        'approved' => \App\Models\Loan::where('status', 'approved')->count(),
+        'rejected' => \App\Models\Loan::where('status', 'rejected')->count(),
+    ];
 
-    return view('admin.analytics', compact('daily', 'weekly', 'monthly'));
+    return view('admin.analytics', compact('analytics'));
 }
 }

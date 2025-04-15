@@ -18,7 +18,7 @@
     <div class="flex h-screen bg-gray-200">
         @include('layouts.sidenav') 
 
-        <div class="flex-1 overflow-x-hidden overflow-y-auto bg-white">
+        <div class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
             @include('layouts.topnav') 
 
             <main>
