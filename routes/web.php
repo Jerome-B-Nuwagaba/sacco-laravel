@@ -11,7 +11,14 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $user = auth()->user();
+
+    return match ($user->role) {
+        'admin' => redirect()->route('admin.dashboard'),
+        'loan_officer' => redirect()->route('loan_officer.dashboard'),
+        'customer' => redirect()->route('customer.dashboard'),
+        default => abort(403),
+    };
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -34,7 +41,8 @@ Route::prefix('admin')->middleware('auth')->group(function () {
 });
 
 Route::prefix('customer')->middleware('auth')->group(function () {
-    Route::get('/dashboard', [CustomerController::class, 'index'])->name('customer.dashboard');    
+    Route::get('/dashboard', [CustomerController::class, 'index'])->name('customer.dashboard');
+    Route::post('/customer/apply-loan', [CustomerController::class, 'applyLoan'])->name('customer.applyLoan');   
     Route::get('/loans/apply', [CustomerController::class, 'createLoan'])->name('customer.loans.apply');
     Route::post('/loans/apply', [CustomerController::class, 'storeLoan'])->name('customer.loans.store');    
     Route::get('/loans', [CustomerController::class, 'myLoans'])->name('customer.loans.index');
@@ -50,7 +58,7 @@ Route::prefix('loan_officer')->middleware('auth')->group(function () {
     //Route::post('/loans/{id}/decline', [LoanOfficerController::class, 'declineLoan'])->name('loan_officer.loans.decline');    
     Route::get('/loans/paid', [LoanOfficerController::class, 'paidLoans'])->name('loan_officer.loans.paid');    
     Route::get('/loans/{id}/payment-plan/create', [LoanOfficerController::class, 'createPaymentPlan'])->name('loan_officer.payment_plan.create');
-    Route::post('/loans/{id}/payment-plan', [LoanOfficerController::class, 'storePaymentPlan'])->name('loan_officer.payment_plan.store');
+    Route::post('/loans/payment-plan', [LoanOfficerController::class, 'storePaymentPlan'])->name('loan_officer.payment_plan.store');
 });
 
 require __DIR__.'/auth.php';

@@ -25,6 +25,23 @@ class CustomerController extends Controller
     return view('customer.dashboard', compact('loanTypes'));
 }
 
+public function applyLoan(Request $request)
+{
+    $request->validate([
+        'amount' => 'required|numeric|min:1',
+        'loan_type_id' => 'required|exists:loan_types,id',
+    ]);
+
+    \App\Models\Loan::create([
+        'user_id' => auth()->id(),
+        'amount' => $request->amount,
+        'loan_type_id' => $request->loan_type_id,
+        'status' => 'pending',
+    ]);
+
+    return redirect()->route('customer.dashboard')->with('success', 'Loan application submitted!');
+}
+
 public function storeLoan(Request $request)
 {
     $request->validate([

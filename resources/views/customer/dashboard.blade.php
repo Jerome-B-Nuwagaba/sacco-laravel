@@ -7,7 +7,7 @@
     <!-- Apply for Loan -->
     <div class="mb-8">
         <h2 class="text-xl font-semibold mb-2">Apply for a Loan</h2>
-        <form action="{{ route('customer.dashboard') }}" method="POST" class="bg-white p-4 rounded shadow">
+        <form action="{{ route('customer.applyLoan') }}" method="POST" class="bg-white p-4 rounded shadow">
             @csrf
             <div class="mb-4">
                 <label for="amount" class="block font-medium">Loan Amount</label>

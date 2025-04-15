@@ -3,12 +3,18 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\Loan;
 
 class LoanOfficerController extends Controller
 {
     public function index()
     {
-        return view('loan_officer.dashboard');
+        $customers = \App\Models\User::where('role', 'customer')->get();
+    $pendingLoans = \App\Models\Loan::where('status', 'pending')->get();
+    $paidLoans = \App\Models\Loan::where('status', 'paid')->get();
+
+        return view('loan_officer.dashboard', compact('customers', 'pendingLoans', 'paidLoans'));
     }
 
     public function customers()
@@ -51,7 +57,7 @@ public function createPaymentPlan($loanId)
 public function storePaymentPlan(Request $request)
 {
     $request->validate([
-        'loan_id' => 'required|exists:loans,id',
+        //'loan_id' => 'required|exists:loans,id',
         'amount_per_installment' => 'required|integer|min:1',
         'number_of_installments' => 'required|integer|min:1',
         'completion_date' => 'required|date|after:today',
