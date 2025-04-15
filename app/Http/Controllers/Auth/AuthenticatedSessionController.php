@@ -37,7 +37,7 @@ class AuthenticatedSessionController extends Controller
         } elseif ($user->role === 'customer') {
             return redirect()->route('customer.dashboard');
         } else {
-            auth()->logout(); // Optional: force logout if role is undefined
+            auth()->logout(); //  force logout if role is undefined
             return redirect()->route('login')->withErrors(['role' => 'Unauthorized role']);
         }
     }
