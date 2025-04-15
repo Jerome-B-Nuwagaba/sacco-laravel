@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('loans', function (Blueprint $table) {
             $table->id();
             $table->integer('amount');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
             $table->foreignId('loan_type_id')->constrained()->onDelete('cascade');
             $table->string('status')->default('pending'); 
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');   

@@ -1,29 +1,21 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto p-6">
-   
-<!-- Summary of the number of employees and customers -->
-    
-
-<!--summary of the loan types available and pending requests-->
-    
-
-    <!-- Loan Analytics -->
-    <div>
-        <h2 class="text-xl font-semibold mb-3">Loan Handled Summary</h2>
+<!-- Loan Analytics -->
+<div>
+        <h2 class="text-xl font-semibold mb-3">Loan Analytics</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div class="bg-gray-100 p-4 rounded text-center shadow">
                 <h3 class="font-bold text-lg">Today</h3>
-                <p class="text-2xl">{{ $analytics['daily'] }}</p>
+                <p class="text-2xl">{{ $daily }}</p>
             </div>
             <div class="bg-gray-100 p-4 rounded text-center shadow">
                 <h3 class="font-bold text-lg">This Week</h3>
-                <p class="text-2xl">{{ $analytics['weekly'] }}</p>
+                <p class="text-2xl">{{ $weekly }}</p>
             </div>
             <div class="bg-gray-100 p-4 rounded text-center shadow">
                 <h3 class="font-bold text-lg">This Month</h3>
-                <p class="text-2xl">{{ $analytics['monthly'] }}</p>
+                <p class="text-2xl">{{ $monthly }}</p>
             </div>
         </div>
     </div>

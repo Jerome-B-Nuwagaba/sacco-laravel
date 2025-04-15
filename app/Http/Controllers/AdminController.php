@@ -23,17 +23,22 @@ class AdminController extends Controller
         return view('admin.dashboard', compact('loanOfficers', 'customers', 'forwardedLoans', 'analytics'));
     }
 
-    public function viewUsers()
+    public function viewEmployees()
+{
+    $loanOfficers = \App\Models\User::where('role', 'loan_officer')->get();
+    return view('admin.users.employees', compact('loanOfficers'));
+}
+public function viewCustomers()
 {
     $loanOfficers = \App\Models\User::where('role', 'loan_officer')->get();
     $customers = User::where('role', 'customer')->with('company')->get();
-    return view('admin.users', compact('loanOfficers', 'customers'));
+    return view('admin.users.customers', compact( 'customers'));
 }
 
 public function forwardedLoans()
 {
-    $loans = \App\Models\Loan::where('status', 'forwarded')->get();
-    return view('admin.forwarded-loans', compact('loans'));
+   $loans = \App\Models\Loan::where('status', 'forwarded')->with(['customer', 'loanType'])->get();
+    return view('admin.loans', compact('loans'));
 }
 
 public function approveLoan($loanId)

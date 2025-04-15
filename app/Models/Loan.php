@@ -16,12 +16,12 @@ class Loan extends Model
 
     public function customer()
 {
-    return $this->belongsTo(User::class, 'user_id');
+    return $this->belongsTo(User::class, 'customer_id', 'id');
 }
 
     public function loanType()
 {
-    return $this->belongsTo(LoanType::class);
+    return $this->belongsTo(LoanType::class, 'loan_type_id', 'id');
 }
 
 public function paymentPlans()

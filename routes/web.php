@@ -33,7 +33,8 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::prefix('admin')->middleware('auth')->group(function () {
-    Route::get('/users', [AdminController::class, 'viewUsers'])->name('admin.users');
+    Route::get('/users/employees', [AdminController::class, 'viewEmployees'])->name('users.employee');
+    Route::get('/users/customers', [AdminController::class, 'viewCustomers'])->name('users.customer');
     Route::get('/loan-types/create', [AdminController::class, 'createLoanType'])->name('admin.loan-types.create');
     Route::post('/loan-types', [AdminController::class, 'storeLoanType'])->name('admin.loan-types.store');
     Route::get('/loans/forwarded', [AdminController::class, 'forwardedLoans'])->name('admin.loans.forwarded');
