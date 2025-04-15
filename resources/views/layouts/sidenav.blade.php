@@ -37,7 +37,7 @@
                         <i class="fas fa-tachometer-alt fa-fw mr-3 text-green-500"></i> Dashboard
                     </a>
                     
-                    <a href="#" class="block py-2 px-4 text-green-700 hover:bg-green-100 focus:outline-none focus:bg-green-100 rounded-md transition duration-150 ease-in-out">
+                    <a href="{{route('loan_officer.loans.pending')}}" class="block py-2 px-4 text-green-700 hover:bg-green-100 focus:outline-none focus:bg-green-100 rounded-md transition duration-150 ease-in-out">
                         <i class="fas fa-file-alt fa-fw mr-3 text-green-500"></i> Loan Applications
                     </a>
                     <a href="#" class="block py-2 px-4 text-green-700 hover:bg-green-100 focus:outline-none focus:bg-green-100 rounded-md mt-2 transition duration-150 ease-in-out">

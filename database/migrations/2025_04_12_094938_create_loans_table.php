@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('loans', function (Blueprint $table) {
             $table->id();
-            $table->integer('amount');
-            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
-            $table->foreignId('loan_type_id')->constrained()->onDelete('cascade');
-            $table->enum('status', ['pending', 'forwarded', 'rejected', 'aproved'])->default('pending');
-            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');   
+            $table->integer('amount'); 
+            $table->foreignId('customer_id')->constrained('users')->onDelete('cascade'); 
+            $table->foreignId('loan_type_id')->constrained('loan_types')->onDelete('cascade'); 
+            $table->enum('status', ['pending', 'forwarded', 'rejected', 'approved', 'paid'])->default('pending'); 
             $table->timestamps();
+            $table->foreignId('loan_officer_id')->nullable()->constrained('users')->onDelete('set null');
         });
     }
 

@@ -58,12 +58,25 @@ public function applyLoan(Request $request)
         'amount' => 'required|numeric|min:1',
         'loan_type_id' => 'required|exists:loan_types,id',
     ]);
+    // 5. Handle file uploads for business loans
+    $documentPaths = [];
+    if ($request->hasFile('business_documents')) {
+        $request->validate([
+            'business_documents' => 'required|array',
+            'business_documents.*' => 'file|mimes:pdf,doc,docx,jpeg,png|max:2048',
+        ]);
+        foreach ($request->file('business_documents') as $file) {
+            $path = $file->store('business_documents', 'public');
+            $documentPaths[] = $path;
+        }
+    }
 
     \App\Models\Loan::create([
-        'user_id' => auth()->id(),
+        'customer_id' => auth()->id(),
         'amount' => $request->amount,
         'loan_type_id' => $request->loan_type_id,
         'status' => 'pending',
+        'business_documents' => $documentPaths ? json_encode($documentPaths) : null,    
     ]);
 
     return redirect()->route('customer.dashboard')->with('success', 'Loan application submitted!');

@@ -8,7 +8,6 @@
             <div class="bg-white p-4 mb-3 rounded shadow">
                 <p><strong>Name:</strong> {{ $officer->name }}</p>
                 <p><strong>Email:</strong> {{ $officer->email }}</p>
-                <p><strong>Company:</strong> {{ $officer->company->name }}</p>
             </div>
         @empty
             <p>No loan officers registered yet.</p>

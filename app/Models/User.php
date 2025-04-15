@@ -27,7 +27,6 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'company_id',
     ];
     
 
@@ -54,8 +53,9 @@ class User extends Authenticatable
         ];
     }
 
-    public function company()
+    
+public function loanOfficer()
 {
-    return $this->belongsTo(Company::class);
+    return $this->belongsTo(User::class, 'loan_officer_id');
 }
 }

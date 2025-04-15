@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('loan_types', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->integer('lower_limit');
+            $table->integer('upper_limit');
             $table->timestamps();
         });
     }

@@ -12,7 +12,7 @@ class AdminController extends Controller
     public function index()
     {
         $loanOfficers = \App\Models\User::where('role', 'loan_officer')->get();
-        $customers = User::where('role', 'customer')->with('company')->get();
+        $customers = User::where('role', 'customer')->get();
     $forwardedLoans = \App\Models\Loan::where('status', 'forwarded')->get();
 
     $analytics = [
@@ -31,7 +31,7 @@ class AdminController extends Controller
 public function viewCustomers()
 {
     $loanOfficers = \App\Models\User::where('role', 'loan_officer')->get();
-    $customers = User::where('role', 'customer')->with('company')->get();
+    $customers = User::where('role', 'customer')->get();
     return view('admin.users.customers', compact( 'customers'));
 }
 
@@ -68,7 +68,11 @@ public function storeLoanType(Request $request)
         'name' => 'required|string|unique:loan_types,name',
     ]);
 
-    \App\Models\LoanType::create(['name' => $request->name]);
+    \App\Models\LoanType::create([
+        'name' => $request->name,
+        'lower_limit' => $request->lower_limit,  
+        'upper_limit' => $request->upper_limit,  
+      ]);
 
     return redirect()->route('admin.dashboard')->with('success', 'Loan type added.');
 }

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', ['admin', 'loan_officer', 'customer']);
-            $table->foreignId('company_id')->constrained()->onDelete('cascade');
+            $table->foreignId('loan_officer_id')->nullable()->constrained('users')->onDelete('set null');
             $table->rememberToken();
             $table->timestamps();
         });

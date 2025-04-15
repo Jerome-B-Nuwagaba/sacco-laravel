@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Company;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -20,10 +19,9 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        $companies = \App\Models\Company::orderBy('name')->get();
-      
+    
         return view('auth.register', [
-            'companies' => $companies,
+           
           
         ]);
     }
@@ -40,7 +38,6 @@ class RegisteredUserController extends Controller
         'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
         'password' => ['required', 'confirmed', Rules\Password::defaults()],
         'role' => ['required', 'in:admin,loan_officer,customer'],
-        'company_id' => ['required', 'exists:companies,id'], 
     ]);
 
     $user = User::create([
@@ -48,7 +45,6 @@ class RegisteredUserController extends Controller
         'email' => $request->email,
         'password' => Hash::make($request->password),
         'role' => $request->role,
-        'company_id' => $request->company_id,
     ]);
 
     event(new Registered($user));

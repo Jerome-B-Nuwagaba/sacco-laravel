@@ -44,12 +44,21 @@
 <div class="mb-10">
     <h2 class="text-xl font-semibold mb-3">Add Loan Types</h2>
     <form action="{{ route('admin.loan-types.store') }}" method="POST" class="bg-white p-4 rounded shadow">
-        @csrf
-        <div class="mb-4">
-            <label for="name" class="block font-medium">Loan Type Name</label>
-            <input type="text" name="name" id="name" class="w-full mt-1 rounded border-gray-300" required>
-        </div>
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Loan Type</button>
-    </form>
+    @csrf
+    <div class="mb-4">
+        <label for="name" class="block font-medium">Loan Type Name</label>
+        <input type="text" name="name" id="name" class="w-full mt-1 rounded border-gray-300" required>
+    </div>
+    <div class="mb-4">
+        <label for="lower_limit" class="block font-medium">Lower Limit</label>
+        <input type="number" name="lower_limit" id="lower_limit" class="w-full mt-1 rounded border-gray-300" required>
+    </div>
+    <div class="mb-4">
+        <label for="upper_limit" class="block font-medium">Upper Limit</label>
+        <input type="number" name="upper_limit" id="upper_limit" class="w-full mt-1 rounded border-gray-300" required>
+    </div>
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Loan Type</button>
+</form>
+
 </div>
 @endsection

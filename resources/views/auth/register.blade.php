@@ -38,24 +38,7 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <!-- Company Dropdown -->
-        <div>
-            <x-input-label for="company_id" :value="__('Company')" />
-            <select 
-                name="company_id" 
-                id="company_id" 
-                class="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50"
-                required
-            >
-                <option value="">Select Company</option>
-                @foreach($companies as $company)
-                    <option value="{{ $company->id }}">
-                        {{ $company->name }}
-                    </option>
-                @endforeach
-            </select>
-            <x-input-error :messages="$errors->get('company_id')" class="mt-2" />
-        </div>
+
 
         <!-- Password -->
         <div>

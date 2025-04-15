@@ -26,9 +26,28 @@ class LoanOfficerController extends Controller
 public function reviewLoans()
 {
     $loans = \App\Models\Loan::where('status', 'pending')->get();
-    return view('loan_officer.review-loans', compact('loans'));
+    return view('loan_officer.loan_applications', compact('loans'));
+}
+public function manageUser(Request $request, User $user)
+{
+    if ($user->loan_officer_id === auth()->id()) {
+        $user->loan_officer_id = null; // Unassign
+        $message = 'Loan Officer unassigned from user.';
+    } else {
+        $user->loan_officer_id = auth()->id(); // Assign
+        $message = 'Loan Officer assigned to user.';
+    }
+    $user->save();
+
+    return redirect()->back()->with('message', $message);
 }
 
+public function show(Loan $loan)
+{
+    $loan = Loan::with('customer_id','amount', 'loanType')->findOrFail($loan->id);
+
+    return view('loan_officer.loan_applications', compact('loan')); 
+}
 public function updateLoanStatus($loanId, Request $request)
 {
     $request->validate([
