@@ -18,7 +18,17 @@ class CustomerController extends Controller
         })->get();
         return view('customer.dashboard', compact('loans', 'loanTypes', 'paymentPlans'));
     }
-
+    public function myLoans()
+    {
+        $loans = Loan::where('customer_id', auth()->id())
+                     ->with('loanType')
+                     ->latest()
+                     ->get();
+        $loanTypes = LoanType::all();
+    
+        return view('customer.myloans', compact('loans','loanTypes'));
+    }
+    
     public function createLoan()
 {
     $loanTypes = LoanType::all(); // Admin-defined types
@@ -65,7 +75,7 @@ public function viewPaymentPlans()
         $query->where('customer_id', auth()->id());
     })->get();
 
-    return view('customer.payment-plans', compact('paymentPlans'));
+    return view('customer.payments', compact('paymentPlans'));
 }
 
 public function acceptPaymentPlan($id)

@@ -50,17 +50,14 @@
             @elseif (auth()->user()->role === 'customer')
                 <div class="mb-6">
                     <h2 class="text-xs font-semibold text-green-500 uppercase tracking-wider mb-3">Customer</h2>
-                    <a href="{{ route('loan_officer.dashboard') }}" class="block py-2 px-4 text-green-700 hover:bg-green-100 focus:outline-none focus:bg-green-100 rounded-md transition duration-150 ease-in-out">
+                    <a href="{{ route('customer.dashboard') }}" class="block py-2 px-4 text-green-700 hover:bg-green-100 focus:outline-none focus:bg-green-100 rounded-md transition duration-150 ease-in-out">
                         <i class="fas fa-tachometer-alt fa-fw mr-3 text-green-500"></i> Dashboard
                     </a>
-                    <a href="#" class="block py-2 px-4 text-green-700 hover:bg-green-100 focus:outline-none focus:bg-green-100 rounded-md transition duration-150 ease-in-out">
-                        <i class="fas fa-paper-plane fa-fw mr-3 text-green-500"></i> Apply for Loan
+                    <a href="{{route('customer.loans.index')}}" class="block py-2 px-4 text-green-700 hover:bg-green-100 focus:outline-none focus:bg-green-100 rounded-md mt-2 transition duration-150 ease-in-out">
+                    <i class="fas fa-money-bill-wave fa-fw mr-3 text-green-500"></i> My Loans
                     </a>
-                    <a href="#" class="block py-2 px-4 text-green-700 hover:bg-green-100 focus:outline-none focus:bg-green-100 rounded-md mt-2 transition duration-150 ease-in-out">
-                        <i class="fas fa-info-circle fa-fw mr-3 text-green-500"></i> Loan Status
-                    </a>
-                    <a href="#" class="block py-2 px-4 text-green-700 hover:bg-green-100 focus:outline-none focus:bg-green-100 rounded-md mt-2 transition duration-150 ease-in-out">
-                        <i class="fas fa-bell fa-fw mr-3 text-green-500"></i> Payment Notifications
+                    <a href="{{route('customer.payments')}}" class="block py-2 px-4 text-green-700 hover:bg-green-100 focus:outline-none focus:bg-green-100 rounded-md mt-2 transition duration-150 ease-in-out">
+                    <i class="fas fa-credit-card fa-fw mr-3 text-green-500"></i> Payments
                     </a>
                     <a href="#" class="block py-2 px-4 text-green-700 hover:bg-green-100 focus:outline-none focus:bg-green-100 rounded-md mt-2 transition duration-150 ease-in-out">
                         <i class="fas fa-headset fa-fw mr-3 text-green-500"></i> Contact Support

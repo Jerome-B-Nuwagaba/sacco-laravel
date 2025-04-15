@@ -44,10 +44,11 @@ Route::prefix('admin')->middleware('auth')->group(function () {
 
 Route::prefix('customer')->middleware('auth')->group(function () {
     Route::get('/dashboard', [CustomerController::class, 'index'])->name('customer.dashboard');
-    Route::post('/customer/apply-loan', [CustomerController::class, 'applyLoan'])->name('customer.applyLoan');   
+    Route::post('/apply-loan', [CustomerController::class, 'applyLoan'])->name('customer.applyLoan');   
     Route::get('/loans/apply', [CustomerController::class, 'createLoan'])->name('customer.loans.apply');
     Route::post('/loans/apply', [CustomerController::class, 'storeLoan'])->name('customer.loans.store');    
-    Route::get('/loans', [CustomerController::class, 'myLoans'])->name('customer.loans.index');
+    Route::get('/myloans', [CustomerController::class, 'myLoans'])->name('customer.loans.index');
+    Route::get('/payments', [CustomerController::class, 'viewPaymentPlans'])->name('customer.payments');
     Route::post('/loans/{loan_id}/pay', [CustomerController::class, 'processLoanPayment'])->name('customer.loans.pay');    
     Route::post('/payment-plans/{id}/accept', [CustomerController::class, 'acceptPaymentPlan'])->name('customer.payment-plans.accept');
 });
