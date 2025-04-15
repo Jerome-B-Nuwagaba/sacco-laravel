@@ -32,7 +32,11 @@
                 </div>
             @elseif (auth()->user()->role === 'loan_officer')
                 <div class="mb-6">
-                    <h2 class="text-xs font-semibold text-green-500 uppercase tracking-wider mb-3">Loan Officer</h2>
+                <h2 class="text-xs font-semibold text-green-500 uppercase tracking-wider mb-3">Loan Officer</h2>
+                    <a href="{{ route('loan_officer.dashboard') }}" class="block py-2 px-4 text-green-700 hover:bg-green-100 focus:outline-none focus:bg-green-100 rounded-md transition duration-150 ease-in-out">
+                        <i class="fas fa-tachometer-alt fa-fw mr-3 text-green-500"></i> Dashboard
+                    </a>
+                    
                     <a href="#" class="block py-2 px-4 text-green-700 hover:bg-green-100 focus:outline-none focus:bg-green-100 rounded-md transition duration-150 ease-in-out">
                         <i class="fas fa-file-alt fa-fw mr-3 text-green-500"></i> Loan Applications
                     </a>
@@ -46,6 +50,9 @@
             @elseif (auth()->user()->role === 'customer')
                 <div class="mb-6">
                     <h2 class="text-xs font-semibold text-green-500 uppercase tracking-wider mb-3">Customer</h2>
+                    <a href="{{ route('loan_officer.dashboard') }}" class="block py-2 px-4 text-green-700 hover:bg-green-100 focus:outline-none focus:bg-green-100 rounded-md transition duration-150 ease-in-out">
+                        <i class="fas fa-tachometer-alt fa-fw mr-3 text-green-500"></i> Dashboard
+                    </a>
                     <a href="#" class="block py-2 px-4 text-green-700 hover:bg-green-100 focus:outline-none focus:bg-green-100 rounded-md transition duration-150 ease-in-out">
                         <i class="fas fa-paper-plane fa-fw mr-3 text-green-500"></i> Apply for Loan
                     </a>
