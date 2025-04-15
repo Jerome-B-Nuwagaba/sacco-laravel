@@ -9,15 +9,32 @@ use App\Models\Loan;
 class CustomerController extends Controller
 {
     public function index()
-    {
-        //return view('customer.dashboard');
-        $loans = Loan::where('customer_id', auth()->id())->with('loanType')->get();
-        $loanTypes = LoanType::all();
-        $paymentPlans = \App\Models\PaymentPlan::whereHas('loan', function ($query) {
-            $query->where('customer_id', auth()->id());
-        })->get();
-        return view('customer.dashboard', compact('loans', 'loanTypes', 'paymentPlans'));
-    }
+{
+    $user = auth()->user();
+
+    $currentLoan = \App\Models\Loan::where('customer_id', $user->id)
+                        ->where('status', 'accepted')
+                        ->with(['loanType', 'payments'])
+                        ->latest()
+                        ->first();
+
+    $paymentPlans = \App\Models\PaymentPlan::whereHas('loan', fn ($q) => $q->where('customer_id', $user->id))
+                        ->where('accepted', false)
+                        ->get();
+
+    $recentPayments = \App\Models\Payment::whereHas('loan', fn ($q) => $q->where('customer_id', $user->id))
+                        ->latest()
+                        ->take(5)
+                        ->get();
+
+    $pastLoans = Loan::where('customer_id', $user->id)
+                    ->where('status', '!=', 'accepted')
+                    ->with('loanType')
+                    ->get();
+
+    return view('customer.dashboard', compact('currentLoan', 'paymentPlans', 'recentPayments', 'pastLoans'));
+}
+
     public function myLoans()
     {
         $loans = Loan::where('customer_id', auth()->id())
