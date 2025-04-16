@@ -23,6 +23,7 @@ class LoanOfficerController extends Controller
     return view('loan_officer.customers', compact('customers'));
 }
 
+
 public function reviewLoans()
 {
     $loans = \App\Models\Loan::where('status', 'pending')->get();
@@ -30,17 +31,31 @@ public function reviewLoans()
 }
 public function manageUser(Request $request, User $user)
 {
+    // 1. Update the user's loan_officer_id
     if ($user->loan_officer_id === auth()->id()) {
         $user->loan_officer_id = null; // Unassign
-        $message = 'Loan Officer unassigned from user.';
+        $message = 'Loan Officer unassigned from user and their loans.';
     } else {
         $user->loan_officer_id = auth()->id(); // Assign
-        $message = 'Loan Officer assigned to user.';
+        $message = 'Loan Officer assigned to user and their loans.';
     }
-    $user->save();
+    $user->save(); // Save the changes to the users table.
+
+    // 2. Update the loans table
+    if ($user->loan_officer_id !== null) {
+        // Assign the loan officer to all loans belonging to this user.
+        Loan::where('customer_id', $user->id)
+            ->update(['loan_officer_id' => auth()->id()]);
+    } else {
+        // Unassign the loan officer from all loans belonging to this user.
+        Loan::where('customer_id', $user->id)
+            ->update(['loan_officer_id' => null]);
+    }
 
     return redirect()->back()->with('message', $message);
 }
+
+
 
 public function show(Loan $loan)
 {

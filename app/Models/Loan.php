@@ -12,6 +12,7 @@ class Loan extends Model
         'amount',
         'loan_type_id',
         'status',
+        'loan_officer_id'
     ];
 
     public function customer()
