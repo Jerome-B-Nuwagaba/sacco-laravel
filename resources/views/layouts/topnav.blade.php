@@ -1,5 +1,5 @@
 <nav x-data="{ open: false, openNotifications: false }"
-     class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+     class="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-900">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
@@ -9,14 +9,15 @@
 
             <div class="flex items-center space-x-6">
                 <div class="relative">
-                    <button @click="openNotifications = ! openNotifications" class="relative">
-                        <i class="fa fa-bell text-xl"></i>
-                        @if(auth()->user()->unreadNotifications->count())
-                            <span class="absolute top-0 right-0 inline-block w-4 h-4 bg-red-600 text-white text-xs leading-tight text-center rounded-full">
-                                {{ auth()->user()->unreadNotifications->count() }}
-                            </span>
-                        @endif
-                    </button>
+                <button @click="openNotifications = !openNotifications" class="relative">
+                    <i class="fa fa-bell text-xl text-gray-600 dark:text-white"></i>
+                    @if(auth()->user()->unreadNotifications->count())
+                        <span class="absolute top-0 right-0 inline-block w-4 h-4 bg-red-600 text-white text-xs leading-tight text-center rounded-full">
+                            {{ auth()->user()->unreadNotifications->count() }}
+                        </span>
+                    @endif
+                </button>
+
 
                     <div x-show="openNotifications" @click.away="openNotifications = false"
                          class="absolute right-0 mt-2 w-80 origin-top-right rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
