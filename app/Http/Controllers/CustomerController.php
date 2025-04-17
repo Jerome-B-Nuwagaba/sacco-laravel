@@ -76,6 +76,7 @@ public function applyLoan(Request $request)
         'amount' => $request->amount,
         'loan_type_id' => $request->loan_type_id,
         'status' => 'pending',
+        'loan_officer_id' => auth()->user()->loan_officer_id,
         'business_documents' => $documentPaths ? json_encode($documentPaths) : null,    
     ]);
 
@@ -94,6 +95,7 @@ public function storeLoan(Request $request)
         'amount' => $request->amount,
         'loan_type_id' => $request->loan_type_id,
         'status' => 'pending',
+        'loan_officer_id' => auth()->user()->loan_officer_id,
     ]);
     // Notify the loan officer if assigned
     if ($customer->loan_officer_id) {

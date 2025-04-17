@@ -8,14 +8,22 @@ use App\Models\Loan;
 
 class LoanOfficerController extends Controller
 {
-    public function index()
+    /*public function index()
     {
         $customers = \App\Models\User::where('role', 'customer')->get();
     $pendingLoans = \App\Models\Loan::where('status', 'pending')->get();
     $paidLoans = \App\Models\Loan::where('status', 'paid')->get();
 
+    $pendingLoans = Loan::where('loan_officer_id', auth()->id())
+        ->where('status', 'approved')
+        ->doesntHave('paymentPlan')
+        ->with('customer')
+        ->get();
+
+        $paidLoans = Loan::where('status', 'paid')->get();
+
         return view('loan_officer.dashboard', compact('customers', 'pendingLoans', 'paidLoans'));
-    }
+    } */
 
     public function customers()
 {
@@ -23,10 +31,36 @@ class LoanOfficerController extends Controller
     return view('loan_officer.customers', compact('customers'));
 }
 
+public function dashboard()
+{
+    $loanOfficerId = auth()->id();
+
+    $customers = User::where(function ($query) use ($loanOfficerId) {
+        $query->whereNull('loan_officer_id') // New customers (unassigned)
+              ->orWhere('loan_officer_id', $loanOfficerId); // Assigned to this loan officer
+    })
+    ->where('role', 'customer')
+    ->get();
+
+    $pendingLoans = Loan::where('loan_officer_id', $loanOfficerId)
+        ->where('status', 'approved')
+        ->doesntHave('paymentPlan')
+        ->with('customer')
+        ->get();
+
+    $paidLoans = Loan::where('loan_officer_id', $loanOfficerId)
+        ->where('status', 'paid')
+        ->with(['customer', 'loanType'])
+        ->get();
+
+    return view('loan_officer.dashboard', compact('customers','pendingLoans', 'paidLoans'));
+}
 
 public function reviewLoans()
 {
-    $loans = \App\Models\Loan::where('status', 'pending')->get();
+    $loans = \App\Models\Loan::where('status', 'pending')
+    ->where('loan_officer_id', auth()->id())
+    ->get();
     return view('loan_officer.loan_applications', compact('loans'));
 }
 public function manageUser(Request $request, User $user)
@@ -105,6 +139,44 @@ public function createPaymentPlan($loanId)
 {
     $loan = \App\Models\Loan::findOrFail($loanId);
     return view('loan_officer.create-payment-plan', compact('loan'));
+}
+
+public function forwardLoan($id)
+{
+    $loan = Loan::findOrFail($id);
+    $loan->status = 'forwarded';
+    $loan->save();
+
+    return redirect()->back()->with('success', 'Loan forwarded successfully.');
+}
+
+public function rejectLoan($id)
+{
+    $loan = Loan::findOrFail($id);
+    $loan->status = 'rejected';
+    $loan->save();
+
+    return redirect()->back()->with('success', 'Loan rejected.');
+}
+
+public function loanDetails($id)
+{
+    $loan = Loan::with(['customer', 'loanType'])->findOrFail($id);
+    return view('loan-officer.partials.loan-details', compact('loan'));
+}
+
+public function managePayments()
+{
+    $loanOfficerId = auth()->id();
+
+    // Only approved loans that belong to this loan officer
+    $pendingLoans = \App\Models\Loan::where('loan_officer_id', $loanOfficerId)
+                        ->where('status', 'approved')
+                        ->doesntHave('paymentPlan') // Optional: only show loans without payment plans yet
+                        ->with(['customer'])
+                        ->get();
+                        
+    return view('loan_officer.manage-payments', compact('pendingLoans'));
 }
 
 public function storePaymentPlan(Request $request)

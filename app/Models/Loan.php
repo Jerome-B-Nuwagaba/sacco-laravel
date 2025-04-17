@@ -28,8 +28,8 @@ public function loanOfficer()
     return $this->belongsTo(LoanType::class, 'loan_type_id', 'id');
 }
 
-public function paymentPlans()
+public function paymentPlan()
 {
-    return $this->hasMany(PaymentPlan::class);
+    return $this->hasOne(PaymentPlan::class);
 }
 }
