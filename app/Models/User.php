@@ -58,4 +58,9 @@ public function loanOfficer()
 {
     return $this->belongsTo(User::class, 'loan_officer_id');
 }
+public function loansAssigned()
+{
+    return $this->hasMany(Loan::class, 'loan_officer_id');
+}
+
 }

@@ -58,6 +58,8 @@ Route::prefix('loan_officer')->middleware('auth')->group(function () {
     Route::get('/customers', [LoanOfficerController::class, 'customers'])->name('loan_officer.customers.index');    
     Route::get('/loan-applications', [LoanOfficerController::class, 'reviewLoans'])->name('loan_officer.loans.pending');
     //Route::post('loans/{loan}/assign', [LoanOfficerController::class, 'assignLoanOfficer'])->name('loan_officer.assign_loan');
+    Route::get('/loans/{loan}/details', [LoanOfficerController::class, 'showDetails'])->name('loan_officer.loans.details');
+
     Route::post('/loans/{loanId}/status', [LoanOfficerController::class, 'updateLoanStatus'])->name('loan_officer.loans.update');
     Route::post('loan_officer/manage_user/{user}', [LoanOfficerController::class, 'manageUser'])->name('loan_officer.manage_user');
 Route::get('loan_officer/loans/{loan}', [LoanOfficerController::class, 'show'])->name('loan_officer.loans.show');

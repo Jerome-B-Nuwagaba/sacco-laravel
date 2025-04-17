@@ -95,6 +95,16 @@ public function storeLoan(Request $request)
         'loan_type_id' => $request->loan_type_id,
         'status' => 'pending',
     ]);
+    // Notify the loan officer if assigned
+    if ($customer->loan_officer_id) {
+        $loanOfficer = User::find($customer->loan_officer_id);
+
+        $loanOfficer->notify(new LoanApplicationNotification(
+            "{$customer->name} submitted a new loan application.",
+            route('loan_officer.loan_applications')
+        ));
+    }
+
 
     return redirect()->route('customer.dashboard')->with('success', 'Loan application submitted.');
 }

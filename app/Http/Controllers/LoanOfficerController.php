@@ -59,10 +59,16 @@ public function manageUser(Request $request, User $user)
 
 public function show(Loan $loan)
 {
-    $loan = Loan::with('customer_id','amount', 'loanType')->findOrFail($loan->id);
+    $loan = Loan::with('customer', 'loanType')->findOrFail($loan->id);
 
     return view('loan_officer.loan_applications', compact('loan')); 
 }
+public function showDetails(Loan $loan)
+{
+    $loan->load('customer', 'loanType');
+    return view('loan_officer.partials.loan_details', compact('loan'));
+}
+
 public function updateLoanStatus($loanId, Request $request)
 {
     $request->validate([
@@ -72,6 +78,19 @@ public function updateLoanStatus($loanId, Request $request)
     $loan = \App\Models\Loan::findOrFail($loanId);
     $loan->status = $request->action;
     $loan->save();
+    // Notify customer
+    $customer = $loan->customer; // assuming you have a relationship set up
+
+    if ($customer) {
+        $message = $request->action === 'forwarded'
+            ? 'Your loan application has been forwarded for approval.'
+            : 'Your loan application has been declined.';
+
+        $customer->notify(new LoanApplicationNotification(
+            $message,
+            route('loans.show', $loan->id)
+        ));
+    }
 
     return redirect()->back()->with('success', 'Loan ' . $request->action);
 }
