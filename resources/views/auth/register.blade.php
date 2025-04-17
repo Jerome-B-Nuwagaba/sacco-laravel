@@ -37,7 +37,14 @@
             />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
-
+ <!-- Phone number -->
+        <div class="mb-4">
+            <label for="phone_number" class="block text-gray-700 font-medium mb-2">Phone Number (optional)</label>
+            <input type="text" name="phone_number" id="phone_number"
+                class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring"
+                placeholder="e.g. 0771234567"
+                value="{{ old('phone_number') }}">
+        </div>
 
 
         <!-- Password -->
