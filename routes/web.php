@@ -49,8 +49,10 @@ Route::prefix('customer')->middleware('auth')->group(function () {
     Route::post('/loans/apply', [CustomerController::class, 'storeLoan'])->name('customer.loans.store');    
     Route::get('/myloans', [CustomerController::class, 'myLoans'])->name('customer.loans.index');
     Route::get('/payments', [CustomerController::class, 'viewPaymentPlans'])->name('customer.payments');
-    Route::post('/loans/{loan_id}/pay', [CustomerController::class, 'processLoanPayment'])->name('customer.loans.pay');    
+    Route::get('/pay-loan/{loanId}', [CustomerController::class, 'showPayLoan'])->name('customer.payLoan');
+    Route::post('/loans/{loan}/pay', [CustomerController::class, 'processLoanPayment'])->name('customer.loans.pay');    
     Route::post('/payment-plans/{id}/accept', [CustomerController::class, 'acceptPaymentPlan'])->name('customer.payment-plans.accept');
+    Route::delete('/reject-plan/{id}', [CustomerController::class, 'rejectPaymentPlan'])->name('customer.rejectPlan');
 });
 
 Route::prefix('loan_officer')->middleware('auth')->group(function () {
@@ -63,7 +65,7 @@ Route::prefix('loan_officer')->middleware('auth')->group(function () {
     Route::post('/loans/{loanId}/status', [LoanOfficerController::class, 'updateLoanStatus'])->name('loan_officer.loans.update');
     Route::post('loan_officer/manage_user/{user}', [LoanOfficerController::class, 'manageUser'])->name('loan_officer.manage_user');
 Route::get('loan_officer/loans/{loan}', [LoanOfficerController::class, 'show'])->name('loan_officer.loans.show');
-    Route::get('/loans/paid', [LoanOfficerController::class, 'paidLoans'])->name('loan_officer.loans.paid');    
+    Route::get('/loans/paid', [LoanOfficerController::class, 'paidLoans'])->name('loan_officer.loans.paid');       
     Route::get('/loans/{id}/payment-plan/create', [LoanOfficerController::class, 'createPaymentPlan'])->name('loan_officer.payment_plan.create');
     Route::post('/loans/payment-plan', [LoanOfficerController::class, 'storePaymentPlan'])->name('loan_officer.payment_plan.store');
     Route::get('/loans/{id}/details', [LoanOfficerController::class, 'loanDetails'])->name('loan_officer.loans.details');

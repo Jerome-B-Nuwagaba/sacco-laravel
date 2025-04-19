@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Notifications\PaymentPlanRejected;
 use App\Models\LoanType;
 use App\Models\Loan;
+use App\Models\Payment;
+use App\Models\PaymentPlan;
 
 class CustomerController extends Controller
 {
@@ -13,19 +16,21 @@ class CustomerController extends Controller
     $user = auth()->user();
 
     $currentLoan = \App\Models\Loan::where('customer_id', $user->id)
-                        ->where('status', 'accepted')
+                        ->whereIn('status', ['approved', 'active'])
                         ->with(['loanType', 'payments'])
                         ->latest()
                         ->first();
 
     $paymentPlans = \App\Models\PaymentPlan::whereHas('loan', fn ($q) => $q->where('customer_id', $user->id))
-                        ->where('accepted', false)
+                        //->where('accepted', false)
                         ->get();
 
-    $recentPayments = \App\Models\Payment::whereHas('loan', fn ($q) => $q->where('customer_id', $user->id))
-                        ->latest()
-                        ->take(5)
-                        ->get();
+    $recentPayments = \App\Models\Payment::whereHas('loan', function ($query) {
+        $query->where('customer_id', auth()->id());
+    })
+    ->latest()
+    ->take(5)
+    ->get();
 
     $pastLoans = Loan::where('customer_id', $user->id)
                     ->where('status', '!=', 'accepted')
@@ -132,27 +137,74 @@ public function acceptPaymentPlan($id)
     $plan->accepted = true;
     $plan->save();
 
+    /*if ($plan->loan->loanOfficer) {
+        $plan->loan->loanOfficer->notify(new \App\Notifications\PaymentPlanAccepted($plan));
+    } */
+
     return redirect()->back()->with('success', 'Payment plan accepted.');
 }
 
 public function showPayLoan()
 {
     $loans = \App\Models\Loan::where('customer_id', auth()->id())->get();
+    $loan = Loan::with('paymentPlan')
+        ->where('id', $loanId)
+        ->where('customer_id', auth()->id())
+        ->firstOrFail();
+
+    if (!$loan->paymentPlan || !$loan->paymentPlan->accepted) {
+        return redirect()->back()->with('error', 'You cannot pay until the payment plan is accepted.');
+    }
+
+    
     return view('customer.pay-loan', compact('loans'));
 }
 
-public function processLoanPayment(Request $request)
+public function processLoanPayment(Request $request, $loanId)
 {
     $request->validate([
         'loan_id' => 'required|exists:loans,id',
         'amount' => 'required|integer|min:1',
     ]);
 
-    \App\Models\LoanPayment::create([
-        'loan_id' => $request->loan_id,
+    $loan = Loan::with('paymentPlan')
+    ->where('id', $loanId)
+        //->where('id', $request->loan_id)
+        ->where('customer_id', auth()->id())
+        ->firstOrFail();
+
+    if (!$loan->paymentPlan || !$loan->paymentPlan->accepted) {
+        return redirect()->back()->with('error', 'Payment plan must be accepted before making a payment.');
+    }
+
+    \App\Models\Payment::create([
+        'loan_id' => $loanId,
         'amount' => $request->amount,
+        //'customer_id' => auth()->id(),        
+        'payment_date' => now(),
     ]);
 
     return redirect()->back()->with('success', 'Payment submitted.');
 }
+
+public function rejectPaymentPlan($planId)
+{
+    $plan = PaymentPlan::whereHas('loan', function ($query) {
+        $query->where('customer_id', auth()->id());
+    })->findOrFail($planId);
+
+    // Notify the loan officer who created the plan
+    if ($plan->created_by) {
+        $loanOfficer = \App\Models\User::find($plan->created_by);
+        if ($loanOfficer) {
+            $loanOfficer->notify(new PaymentPlanRejected($plan));
+        }
+    }
+
+    // Optionally, delete the rejected plan
+    //$plan->delete();
+
+    return redirect()->back()->with('success', 'Payment plan rejected. The loan officer will create a new one.');
+}
+
 }

@@ -54,10 +54,10 @@
             @foreach ($paymentPlans as $plan)
                 <li class="mb-3 border-b border-gray-200 dark:border-gray-700 pb-2">
                     <p class="text-gray-700 dark:text-gray-300">
-                        <strong>Due Date:</strong> {{ $plan->due_date->format('M d, Y') }}
+                        <strong>Completion Date:</strong> {{ $plan->completion_date->format('M d, Y') }}
                     </p>
                     <p class="text-gray-700 dark:text-gray-300">
-                        <strong>Amount:</strong> UGX {{ number_format($plan->amount) }}
+                        <strong>Amount:</strong> UGX {{ number_format($plan->amount_per_installment * $plan->number_of_installments) }}
                     </p>
                     <p class="text-gray-700 dark:text-gray-300">
                         <strong>Status:</strong> {{ $plan->accepted ? 'Accepted' : 'Pending' }}

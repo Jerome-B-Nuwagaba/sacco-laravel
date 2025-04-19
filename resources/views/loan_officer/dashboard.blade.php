@@ -41,13 +41,34 @@
     @endif
 
     <div class="mb-8">
-        <h2 class="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">Paid Loans</h2>
+        <h2 class="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">Loans and Repayment Progress</h2>
         @forelse ($paidLoans as $loan)
+        @php
+            $paid     = $loan->payments->sum('amount');
+            $total    = $loan->amount;
+            $progress = $total > 0 ? ($paid / $total) * 100 : 0;
+        @endphp
             <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mb-4">
                 <p class="text-gray-700 dark:text-gray-200"><strong>Customer:</strong> <span class="text-blue-600 dark:text-blue-400">{{ $loan->customer->name }}</span></p>
                 <p class="text-gray-700 dark:text-gray-200"><strong>Amount Paid:</strong> <span class="text-green-600 dark:text-green-400">{{ number_format($loan->amount, 2) }} UGX</span></p>
                 <p class="text-gray-700 dark:text-gray-200"><strong>Loan Type:</strong> <span class="text-gray-800 dark:text-gray-100">{{ $loan->loanType->name }}</span></p>
             </div>
+            <div class="mt-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Repayment Progress
+                </label>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mt-1">
+                    <div
+                        class="bg-green-500 h-4 rounded-full"
+                        style="width: {{ $progress }}%"
+                    ></div>
+                </div>
+                <p class="text-sm mt-1 text-gray-600 dark:text-gray-400">
+                    UGX {{ number_format($paid) }} of UGX {{ number_format($total) }} paid
+                    ({{ number_format($progress, 1) }}%)
+                </p>
+            </div>
+        </div>
         @empty
             <p class="text-gray-500 dark:text-gray-400">No paid loans yet.</p>
         @endforelse
@@ -82,6 +103,15 @@
             </div>
 
             <div class="mb-4">
+    <label for="installment_duration" class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Installment Duration</label>
+    <select name="installment_duration" id="installment_duration" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+        <option value="">Select Duration</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+    </select>
+</div>
+
+            <div class="mb-4">
                 <label for="completion_date" class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Completion Date</label>
                 <input type="date" name="completion_date" id="completion_date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
             </div>
@@ -90,4 +120,11 @@
         </form>
     </div>
 </div>
+@foreach ($notifications as $notification)
+    <div class="alert alert-info">
+        {{ $notification->data['message'] }}
+        <a href="{{ route('loan.show', $notification->data['loan_id']) }}">View Loan</a>
+    </div>
+@endforeach
+
 @endsection

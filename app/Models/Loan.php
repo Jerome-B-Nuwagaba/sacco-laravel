@@ -32,4 +32,9 @@ public function paymentPlan()
 {
     return $this->hasOne(PaymentPlan::class);
 }
+
+public function payments()
+{
+    return $this->hasMany(Payment::class);
+}
 }

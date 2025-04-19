@@ -26,6 +26,7 @@
                     </span>
                 </p>
 
+                @if (!$plan->accepted)
                 <form action="{{ route('customer.payment-plans.accept', $plan->id) }}" method="POST" class="mt-4">
                     @csrf
                     <button
@@ -37,6 +38,19 @@
                         Accept Plan
                     </button>
                 </form>
+
+                <div class="mb-4">
+                <form action="{{ route('customer.rejectPlan', $plan->id) }}" method="POST" style="display:inline-block;">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700
+                               text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2
+                               focus:ring-green-400 transition">Reject</button>
+    </form>
+</div>
+    @else
+    <span class="badge bg-success">Accepted</span>
+@endif
             </div>
         @empty
             <p class="text-gray-600 dark:text-gray-400">No payment plans yet.</p>

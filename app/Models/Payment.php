@@ -12,11 +12,11 @@ class Payment extends Model
     protected $fillable = [
         'loan_id',
         'amount',
-        'paid_at',
+        'payment_date',
     ];
 
     protected $dates = [
-        'paid_at',
+        'payment_date',
     ];
 
     // Relationships

@@ -25,6 +25,8 @@ class LoanOfficerController extends Controller
         return view('loan_officer.dashboard', compact('customers', 'pendingLoans', 'paidLoans'));
     } */
 
+    
+
     public function customers()
 {
     $customers = \App\Models\User::where('role', 'customer')->get();
@@ -34,6 +36,8 @@ class LoanOfficerController extends Controller
 public function dashboard()
 {
     $loanOfficerId = auth()->id();
+
+    $notifications = auth()->user()->unreadNotifications;
 
     $customers = User::where(function ($query) use ($loanOfficerId) {
         $query->whereNull('loan_officer_id') // New customers (unassigned)
@@ -49,11 +53,11 @@ public function dashboard()
         ->get();
 
     $paidLoans = Loan::where('loan_officer_id', $loanOfficerId)
-        ->where('status', 'paid')
-        ->with(['customer', 'loanType'])
+        ->whereIn('status', ['paid', 'in_progress'])
+        ->with(['customer', 'loanType', 'payments'])
         ->get();
 
-    return view('loan_officer.dashboard', compact('customers','pendingLoans', 'paidLoans'));
+    return view('loan_officer.dashboard', compact('customers','pendingLoans', 'paidLoans', 'notifications'));
 }
 
 public function reviewLoans()
@@ -131,7 +135,13 @@ public function updateLoanStatus($loanId, Request $request)
 
 public function paidLoans()
 {
-    $loans = \App\Models\Loan::where('status', 'paid')->get();
+    //$loans = \App\Models\Loan::where('status', 'paid')
+    $loans = \App\Models\Loan::where('loan_officer_id', auth()->id())
+        ->whereIn('status', ['accepted', 'active', 'completed']) // loans in progress or done
+        ->with(['customer', 'loanType', 'payments']) // eager load relationships
+        ->latest()
+        ->get();
+   
     return view('loan_officer.paid-loans', compact('loans'));
 }
 
@@ -193,6 +203,9 @@ public function storePaymentPlan(Request $request)
         'amount_per_installment' => $request->amount_per_installment,
         'number_of_installments' => $request->number_of_installments,
         'completion_date' => $request->completion_date,
+        'installment_duration' => $request->installment_duration, 
+        'created_by' => auth()->id(), // loan officer ID
+        'accepted' => false,
     ]);
 
     return redirect()->route('loan_officer.dashboard')->with('success', 'Payment plan created.');

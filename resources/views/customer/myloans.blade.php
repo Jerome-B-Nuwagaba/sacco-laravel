@@ -28,15 +28,16 @@
                     @if ($loan->status === 'approved')
                         <form action="{{ route('customer.loans.pay', $loan->id) }}" method="POST" class="mt-4">
                             @csrf
+                            <input type="hidden" name="loan_id" value="{{ $loan->id }}">
                             <div class="mb-3">
-                                <label for="payment_amount" class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
-                                    Payment Amount (UGX)
+                                <label for="amount" class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
+                                    Amount (UGX)
                                 </label>
                                 <input
                                    type="number"
-                                   name="payment_amount"
-                                   id="payment_amount"
-                                   placeholder="Enter payment amount"
+                                   name="amount"
+                                   id="amount"
+                                   placeholder="Enter amount"
                                    class="shadow appearance-none border border-gray-300 dark:border-gray-600 rounded w-full py-2 px-3
                                           bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 leading-tight
                                           focus:outline-none focus:shadow-outline focus:bg-white dark:focus:bg-gray-600"
