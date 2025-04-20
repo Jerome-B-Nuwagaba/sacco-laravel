@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('amount'); 
             $table->foreignId('customer_id')->constrained('users')->onDelete('cascade'); 
             $table->foreignId('loan_type_id')->constrained('loan_types')->onDelete('cascade'); 
-            $table->enum('status', ['pending', 'forwarded', 'rejected', 'approved', 'paid'])->default('pending'); 
+            $table->enum('status', ['pending', 'forwarded', 'rejected', 'approved', 'active', 'paid'])->default('pending'); 
             $table->timestamps();
             $table->foreignId('loan_officer_id')->nullable()->constrained('users')->onDelete('set null');
         });

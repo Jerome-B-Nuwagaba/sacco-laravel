@@ -19,6 +19,10 @@ class AdminController extends Controller
         'daily' => \App\Models\Loan::whereDate('created_at', today())->count(),
         'weekly' => \App\Models\Loan::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
         'monthly' => \App\Models\Loan::whereMonth('created_at', now()->month)->count(),
+        'users' => \App\Models\User::count(),
+        'pending' => \App\Models\Loan::where('status', 'pending')->count(),
+        'approved' => \App\Models\Loan::where('status', 'approved')->count(),
+        'rejected' => \App\Models\Loan::where('status', 'rejected')->count(),
     ];
         return view('admin.dashboard', compact('loanOfficers', 'customers', 'forwardedLoans', 'analytics'));
     }
@@ -83,10 +87,7 @@ public function analytics()
         'daily' => \App\Models\Loan::whereDate('created_at', today())->count(),
         'weekly' => \App\Models\Loan::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
         'monthly' => \App\Models\Loan::whereMonth('created_at', now()->month)->count(),
-        'users' => \App\Models\User::count(),
-        'pending' => \App\Models\Loan::where('status', 'pending')->count(),
-        'approved' => \App\Models\Loan::where('status', 'approved')->count(),
-        'rejected' => \App\Models\Loan::where('status', 'rejected')->count(),
+        
     ];
 
     return view('admin.analytics', compact('analytics'));

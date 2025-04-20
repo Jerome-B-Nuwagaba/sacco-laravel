@@ -66,8 +66,9 @@ Route::prefix('loan_officer')->middleware('auth')->group(function () {
     Route::post('loan_officer/manage_user/{user}', [LoanOfficerController::class, 'manageUser'])->name('loan_officer.manage_user');
 Route::get('loan_officer/loans/{loan}', [LoanOfficerController::class, 'show'])->name('loan_officer.loans.show');
     Route::get('/loans/paid', [LoanOfficerController::class, 'paidLoans'])->name('loan_officer.loans.paid');       
-    Route::get('/loans/{id}/payment-plan/create', [LoanOfficerController::class, 'createPaymentPlan'])->name('loan_officer.payment_plan.create');
+    Route::get('/loans/payment-plan/create', [LoanOfficerController::class, 'createPaymentPlan'])->name('loan_officer.payment_plan.create');
     Route::post('/loans/payment-plan', [LoanOfficerController::class, 'storePaymentPlan'])->name('loan_officer.payment_plan.store');
+    Route::get('/loan-officer/payment-plans/{plan}', [LoanOfficerController::class, 'showPaymentPlan'])->name('loan_officer.payment_plan.show');
     Route::get('/loans/{id}/details', [LoanOfficerController::class, 'loanDetails'])->name('loan_officer.loans.details');
 });
 

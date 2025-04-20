@@ -43,9 +43,10 @@
                     <a href="#" class="block py-2 px-4 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-gray-700 focus:outline-none focus:bg-green-100 dark:focus:bg-gray-700 rounded-md mt-2 transition duration-150 ease-in-out">
                         <i class="fas fa-hand-holding-usd fa-fw mr-3 text-green-500 dark:text-green-400"></i> My Loans
                     </a>
-                    <a href="#" class="block py-2 px-4 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-gray-700 focus:outline-none focus:bg-green-100 dark:focus:bg-gray-700 rounded-md mt-2 transition duration-150 ease-in-out">
+                    <a href="{{route('loan_officer.payment_plan.create')}}" class="block py-2 px-4 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-gray-700 focus:outline-none focus:bg-green-100 dark:focus:bg-gray-700 rounded-md mt-2 transition duration-150 ease-in-out">
                         <i class="fas fa-credit-card fa-fw mr-3 text-green-500 dark:text-green-400"></i> Manage Payments
                     </a>
+                   
                 </div>
             @elseif (auth()->user()->role === 'customer')
                 <div class="mb-6">

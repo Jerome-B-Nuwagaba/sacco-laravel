@@ -74,52 +74,7 @@
         @endforelse
     </div>
 
-    <div>
-        <h2 class="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">Create Payment Plan</h2>
-        <form action="{{ route('loan_officer.payment_plan.store') }}" method="POST" class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
-            @csrf
-            <div class="mb-4">
-                <label for="loan_id" class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Select Loan</label>
-                <select name="loan_id" id="loan_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                    <option value="">Select Loan</option>
-                    @foreach ($pendingLoans as $loan)
-                        @if(auth()->user()->role == 'loan_officer' && $loan->loan_officer_id == auth()->user()->id)
-                            <option value="{{ $loan->id }}">{{ $loan->customer->name }} - {{ number_format($loan->amount, 2) }} UGX</option>
-                        @elseif(auth()->user()->role != 'loan_officer')
-                            <option value="{{ $loan->id }}">{{ $loan->customer->name }} - {{ number_format($loan->amount, 2) }} UGX</option>
-                        @endif
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="mb-4">
-                <label for="amount_per_installment" class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Amount per Installment</label>
-                <input type="number" name="amount_per_installment" id="amount_per_installment" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-            </div>
-
-            <div class="mb-4">
-                <label for="number_of_installments" class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Number of Installments</label>
-                <input type="number" name="number_of_installments" id="number_of_installments" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-            </div>
-
-            <div class="mb-4">
-    <label for="installment_duration" class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Installment Duration</label>
-    <select name="installment_duration" id="installment_duration" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-        <option value="">Select Duration</option>
-        <option value="weekly">Weekly</option>
-        <option value="monthly">Monthly</option>
-    </select>
-</div>
-
-            <div class="mb-4">
-                <label for="completion_date" class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Completion Date</label>
-                <input type="date" name="completion_date" id="completion_date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-200 dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-            </div>
-
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Create Payment Plan</button>
-        </form>
-    </div>
-</div>
+   
 @foreach ($notifications as $notification)
     <div class="alert alert-info">
         {{ $notification->data['message'] }}

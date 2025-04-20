@@ -5,6 +5,7 @@
     {{-- Top Summary Cards --}}
     <div>
         <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Dashboard Overview</h2>
+
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow text-center">
                 <h3 class="text-gray-600 dark:text-gray-400 font-semibold">Total Users</h3>

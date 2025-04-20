@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Loan;
+use App\Models\PaymentPlan;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 
 class LoanOfficerController extends Controller
 {
@@ -145,10 +148,16 @@ public function paidLoans()
     return view('loan_officer.paid-loans', compact('loans'));
 }
 
-public function createPaymentPlan($loanId)
+public function createPaymentPlan()
 {
-    $loan = \App\Models\Loan::findOrFail($loanId);
-    return view('loan_officer.create-payment-plan', compact('loan'));
+    // Get the current loan officer's ID
+    $loanOfficerId = Auth::id();
+
+    $loans = Loan::where('loan_officer_id', $loanOfficerId)
+            ->where('status', 'approved') 
+            ->get();
+
+    return view('loan_officer.manage-payments', compact('loans'));
 }
 
 public function forwardLoan($id)
@@ -191,23 +200,32 @@ public function managePayments()
 
 public function storePaymentPlan(Request $request)
 {
-    $request->validate([
-        //'loan_id' => 'required|exists:loans,id',
-        'amount_per_installment' => 'required|integer|min:1',
-        'number_of_installments' => 'required|integer|min:1',
-        'completion_date' => 'required|date|after:today',
-    ]);
+    $installments = (int) $request->input('number_of_installments');
+    $completion_date = Carbon::now();
+
+    if ($request->input('installment_duration') === 'weekly') {
+        $completion_date = $completion_date->addWeeks($installments);
+    } elseif ($request->input('installment_duration') === 'monthly') {
+        $completion_date = $completion_date->addMonths($installments);
+    }
+
 
     \App\Models\PaymentPlan::create([
-        'loan_id' => $request->loan_id,
-        'amount_per_installment' => $request->amount_per_installment,
-        'number_of_installments' => $request->number_of_installments,
-        'completion_date' => $request->completion_date,
-        'installment_duration' => $request->installment_duration, 
-        'created_by' => auth()->id(), // loan officer ID
-        'accepted' => false,
+        'loan_id'                 => $request->input('loan_id'),
+        'amount_per_installment'  => $request->input('amount_per_installment'),
+        'number_of_installments'  => $installments,
+        'completion_date'         => $completion_date,
+        'installment_duration'    => $request->input('installment_duration'),
+        'created_by'              => auth()->id(),
     ]);
 
     return redirect()->route('loan_officer.dashboard')->with('success', 'Payment plan created.');
 }
+
+public function showPaymentPlan(PaymentPlan $plan)
+{
+    $plan->load('loan.customer', 'loan.loanType');
+    return view('loan_officer.partials.view-payment-plan', compact('plan'));
+}
+
 }
