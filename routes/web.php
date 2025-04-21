@@ -40,6 +40,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::post('/loan-types', [AdminController::class, 'storeLoanType'])->name('admin.loan-types.store');
     Route::get('/loans/forwarded', [AdminController::class, 'forwardedLoans'])->name('admin.loans.forwarded');
     Route::post('/loans/{id}/approve', [AdminController::class, 'approveLoan'])->name('admin.loans.approve');
+    Route::post('/loans/{id}/reject', [AdminController::class, 'rejectLoan'])->name('admin.loans.reject');
     Route::get('/analytics', [AdminController::class, 'analytics'])->name('admin.analytics');
 });
 

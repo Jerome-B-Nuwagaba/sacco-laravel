@@ -16,9 +16,9 @@ class AdminController extends Controller
     $forwardedLoans = \App\Models\Loan::where('status', 'forwarded')->get();
 
     $analytics = [
-        'daily' => \App\Models\Loan::whereDate('created_at', today())->count(),
-        'weekly' => \App\Models\Loan::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
-        'monthly' => \App\Models\Loan::whereMonth('created_at', now()->month)->count(),
+        'daily' => \App\Models\Loan::whereDate('updated_at', today())->count(),
+        'weekly' => \App\Models\Loan::whereBetween('updated_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+        'monthly' => \App\Models\Loan::whereMonth('updated_at', now()->month)->count(),
         'users' => \App\Models\User::count(),
         'pending' => \App\Models\Loan::where('status', 'pending')->count(),
         'approved' => \App\Models\Loan::where('status', 'approved')->count(),
@@ -102,6 +102,36 @@ public function analytics()
                 'count' => $item->count,
             ];
         });
-    return view('admin.analytics', compact('analytics', 'monthlyTrend'));
+        // Fetch daily loan application trend for the last 7 days
+        $dailyTrend = Loan::select(DB::raw('DATE(created_at) as date, COUNT(*) as count'))
+            ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'day' => \Carbon\Carbon::parse($item->date)->format('D'),
+                    'count' => $item->count,
+                ];
+            });
+
+        // Fetch weekly loan application trend for the last 4 weeks
+        $weeklyTrend = Loan::select(DB::raw(
+            'YEARWEEK(created_at, 3) as yearweek, ' . // Use 3 to ensure Monday is the first day of the week
+            'DATE_FORMAT(MIN(created_at), "%b %d") as week_start, ' .
+            'DATE_FORMAT(MAX(created_at), "%b %d") as week_end, ' .
+            'COUNT(*) as count'
+        ))
+            ->where('created_at', '>=', now()->subWeeks(3)->startOfWeek())
+            ->groupBy('yearweek')
+            ->orderBy('yearweek')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'week_label' => $item->week_start . ' - ' . $item->week_end,
+                    'count' => $item->count,
+                ];
+            });
+    return view('admin.analytics', compact('analytics', 'monthlyTrend', 'dailyTrend', 'weeklyTrend'));
 }
 }

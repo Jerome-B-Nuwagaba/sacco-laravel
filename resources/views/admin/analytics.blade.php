@@ -24,6 +24,18 @@
             </div>
         </div>
 
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-2">Daily Loan Application Trend (Last 7 Days)</h3>
+                <canvas id="dailyTrendChart" width="800" height="400"></canvas>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+                <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-2">Weekly Loan Application Trend (Last 4 Weeks)</h3>
+                <canvas id="weeklyTrendChart" width="800" height="400"></canvas>
+            </div>
+        </div>
+
         <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mb-6">
             <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-2">Monthly Loan Application Trend (Last 6 Months)</h3>
             <canvas id="monthlyTrendChart" width="800" height="400"></canvas>
@@ -34,6 +46,8 @@
             const weeklyLoans = {{ $analytics['weekly'] }};
             const monthlyLoans = {{ $analytics['monthly'] }};
             const monthlyTrendData = @json($monthlyTrend);
+            const dailyTrendData = @json($dailyTrend);
+            const weeklyTrendData = @json($weeklyTrend);
 
             // Daily Loans Chart
             const dailyCtx = document.getElementById('dailyLoansChart').getContext('2d');
@@ -116,10 +130,80 @@
                 }
             });
 
+            // Daily Trend Chart (Last 7 Days)
+            const dailyTrendCtx = document.getElementById('dailyTrendChart').getContext('2d');
+            const dailyTrendChart = new Chart(dailyTrendCtx, {
+                type: 'line',
+                data: {
+                    labels: dailyTrendData.map(item => item.day),
+                    datasets: [{
+                        label: 'Daily Applications',
+                        data: dailyTrendData.map(item => item.count),
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Applications'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Day'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Weekly Trend Chart (Last 4 Weeks)
+            const weeklyTrendCtx = document.getElementById('weeklyTrendChart').getContext('2d');
+            const weeklyTrendChart = new Chart(weeklyTrendCtx, {
+                type: 'line',
+                data: {
+                    labels: weeklyTrendData.map(item => item.week_label),
+                    datasets: [{
+                        label: 'Weekly Applications',
+                        data: weeklyTrendData.map(item => item.count),
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: 'rgba(255, 99, 132, 1)'
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Applications'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Week'
+                            }
+                        }
+                    }
+                }
+            });
+
             // Monthly Trend Chart (Last 6 Months)
             const trendCtx = document.getElementById('monthlyTrendChart').getContext('2d');
             const trendChart = new Chart(trendCtx, {
-                type: 'line', // Use a line chart for trends
+                type: 'line',
                 data: {
                     labels: monthlyTrendData.map(item => item.month_year),
                     datasets: [{
@@ -128,7 +212,7 @@
                         borderColor: 'rgba(75, 192, 192, 1)',
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderWidth: 2,
-                        pointRadius: 5,
+                        pointRadius: 3,
                         pointBackgroundColor: 'rgba(75, 192, 192, 1)'
                     }]
                 },
