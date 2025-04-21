@@ -14,6 +14,7 @@ class PaymentPlan extends Model
         'installment_duration',
         'created_by',
         'accepted',
+        'status',
     ];
     
 

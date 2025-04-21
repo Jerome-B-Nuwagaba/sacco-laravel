@@ -53,6 +53,8 @@ Route::prefix('customer')->middleware('auth')->group(function () {
     Route::post('/loans/{loan}/pay', [CustomerController::class, 'processLoanPayment'])->name('customer.loans.pay');    
     Route::post('/payment-plans/{id}/accept', [CustomerController::class, 'acceptPaymentPlan'])->name('customer.payment-plans.accept');
     Route::delete('/reject-plan/{id}', [CustomerController::class, 'rejectPaymentPlan'])->name('customer.rejectPlan');
+    Route::get('/support', [CustomerController::class, 'supportPage'])->name('customer.support');
+    Route::post('/support', [CustomerController::class, 'submitSupportRequest'])->name('customer.support.submit');
 });
 
 Route::prefix('loan_officer')->middleware('auth')->group(function () {

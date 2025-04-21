@@ -6,7 +6,7 @@
         Welcome, {{ auth()->user()->name }}
     </h1>
 
-    @if ($currentLoan)
+    @if ($currentLoan && $currentLoan->paymentPlan && $currentLoan->paymentPlan->status === 'active')
     <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mb-8">
         <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
             Current Loan Status
@@ -22,9 +22,11 @@
         </p>
 
         @php
+            $plan = $currentLoan->paymentPlan;
+            $totalDue = $plan ? ($plan->amount_per_installment * $plan->number_of_installments)
+                : $currentLoan->amount;
             $paid     = $currentLoan->payments->sum('amount');
-            $total    = $currentLoan->amount;
-            $progress = $total > 0 ? ($paid / $total) * 100 : 0;
+            $progress = $totalDue > 0 ? ($paid / $totalDue) * 100 : 0;
         @endphp
 
         <div class="mt-4">
@@ -38,12 +40,13 @@
                 ></div>
             </div>
             <p class="text-sm mt-1 text-gray-600 dark:text-gray-400">
-                UGX {{ number_format($paid) }} of UGX {{ number_format($total) }} paid
+                UGX {{ number_format($paid) }} of UGX {{ number_format($totalDue) }} paid
                 ({{ number_format($progress, 1) }}%)
             </p>
         </div>
     </div>
-    @endif
+@endif
+
 
     @if (count($paymentPlans) > 0)
     <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mb-8">
@@ -51,7 +54,7 @@
             Active Payment Plans
         </h2>
         <ul>
-            @foreach ($paymentPlans as $plan)
+            @foreach ($paymentPlans->where('status', 'active') as $plan)
                 <li class="mb-3 border-b border-gray-200 dark:border-gray-700 pb-2">
                     <p class="text-gray-700 dark:text-gray-300">
                         <strong>Completion Date:</strong> {{ $plan->completion_date->format('M d, Y') }}
@@ -66,7 +69,30 @@
             @endforeach
         </ul>
     </div>
-    @endif
+@endif
+@if ($paymentPlans->where('status', 'completed')->count() > 0)
+<div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mb-8">
+    <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
+        Completed Payment Plans
+    </h2>
+    <ul>
+        @foreach ($paymentPlans->where('status', 'completed') as $plan)
+            <li class="mb-3 border-b border-gray-200 dark:border-gray-700 pb-2">
+                <p class="text-gray-700 dark:text-gray-300">
+                    <strong>Completion Date:</strong> {{ $plan->completion_date->format('M d, Y') }}
+                </p>
+                <p class="text-gray-700 dark:text-gray-300">
+                    <strong>Total Amount:</strong> UGX {{ number_format($plan->amount_per_installment * $plan->number_of_installments) }}
+                </p>
+                <p class="text-gray-700 dark:text-gray-300">
+                    <strong>Status:</strong> Completed
+                </p>
+            </li>
+        @endforeach
+    </ul>
+</div>
+@endif
+
 
     <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mb-8">
         <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">

@@ -26,32 +26,11 @@
                     </p>
 
                     @if ($loan->status === 'approved')
-                        <form action="{{ route('customer.loans.pay', $loan->id) }}" method="POST" class="mt-4">
-                            @csrf
-                            <input type="hidden" name="loan_id" value="{{ $loan->id }}">
-                            <div class="mb-3">
-                                <label for="amount" class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
-                                    Amount (UGX)
-                                </label>
-                                <input
-                                   type="number"
-                                   name="amount"
-                                   id="amount"
-                                   placeholder="Enter amount"
-                                   class="shadow appearance-none border border-gray-300 dark:border-gray-600 rounded w-full py-2 px-3
-                                          bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 leading-tight
-                                          focus:outline-none focus:shadow-outline focus:bg-white dark:focus:bg-gray-600"
-                                   required
-                                >
-                            </div>
-                            <button
-                                type="submit"
-                                class="bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                            >
-                                Pay
-                            </button>
-                        </form>
-                    @endif
+                        <a href="{{route('customer.payments')}}" class="inline-block bg-green-500 hover:bg-green-600 focus:ring-2 focus:ring-offset-2 focus:ring-green-400  text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-150" >
+                            Make Payment
+                        </a>
+@endif
+
                 </div>
             @empty
                 <p class="text-gray-500 dark:text-gray-400">No loan applications yet.</p>

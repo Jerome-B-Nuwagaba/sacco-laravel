@@ -8,6 +8,7 @@ use App\Models\LoanType;
 use App\Models\Loan;
 use App\Models\Payment;
 use App\Models\PaymentPlan;
+use App\Models\SupportRequest;
 
 class CustomerController extends Controller
 {
@@ -166,10 +167,9 @@ public function processLoanPayment(Request $request, $loanId)
         'loan_id' => 'required|exists:loans,id',
         'amount' => 'required|integer|min:1',
     ]);
-
+    
     $loan = Loan::with('paymentPlan')
-    ->where('id', $loanId)
-        //->where('id', $request->loan_id)
+        ->where('id', $loanId)
         ->where('customer_id', auth()->id())
         ->firstOrFail();
 
@@ -179,12 +179,18 @@ public function processLoanPayment(Request $request, $loanId)
 
     \App\Models\Payment::create([
         'loan_id' => $loanId,
-        'amount' => $request->amount,
-        //'customer_id' => auth()->id(),        
+        'amount' => $request->amount,        
         'payment_date' => now(),
     ]);
+    $loan->load('payments');
+    $totalPaid = $loan->payments->sum('amount') + $request->amount;
+    $totalExpected = $loan->paymentPlan->amount_per_installment * $loan->paymentPlan->number_of_installments;
 
-    return redirect()->back()->with('success', 'Payment submitted.');
+    if ($totalPaid >= $totalExpected) {
+        $loan->paymentPlan->update(['status' => 'completed']);
+       
+    }
+    return redirect()->back()->with('success', 'UGX '.number_format($request['amount']).' paid sucessfuly!!!');
 }
 
 public function rejectPaymentPlan($planId)
@@ -206,5 +212,32 @@ public function rejectPaymentPlan($planId)
 
     return redirect()->back()->with('success', 'Payment plan rejected. The loan officer will create a new one.');
 }
+public function supportPage()
+{
+  
+    $faqs = [
+        ['question' => 'How can I apply for a loan?', 'answer' => 'To apply for a loan, go to the Loans section and fill out the application form.'],
+        ['question' => 'What is the repayment schedule?', 'answer' => 'The repayment schedule is defined by your assigned loan officer after aproval.'],
+       
+    ];
 
+    return view('customer.support', compact('faqs'));
+}
+
+public function submitSupportRequest(Request $request)
+{
+    
+    $request->validate([
+        'message' => 'required|string|max:1000',
+        'email' => 'required|email',
+    ]);
+    // Store the support request
+    SupportRequest::create([
+        'user_id' => auth()->id(),
+        'email' => $request->email,
+        'message' => $request->message,
+    ]);
+
+    return redirect()->route('customer.support')->with('success', 'Your support request has been submitted!');
+}
 }
