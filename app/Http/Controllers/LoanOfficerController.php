@@ -188,14 +188,14 @@ public function managePayments()
 {
     $loanOfficerId = auth()->id();
 
-    // Only approved loans that belong to this loan officer
-    $pendingLoans = \App\Models\Loan::where('loan_officer_id', $loanOfficerId)
-                        ->where('status', 'approved')
-                        ->doesntHave('paymentPlan') // Optional: only show loans without payment plans yet
-                        ->with(['customer'])
-                        ->get();
-                        
-    return view('loan_officer.manage-payments', compact('pendingLoans'));
+    $loans = Loan::where('loan_officer_id', $loanOfficerId)
+        ->where('status', 'approved')
+        ->with(['customer', 'paymentPlan', 'payments' => function ($query) {
+            $query->orderBy('payment_date');
+        }])
+        ->get();
+
+    return view('loan_officer.manage-payments', compact('loans'));
 }
 
 public function storePaymentPlan(Request $request)
@@ -222,10 +222,25 @@ public function storePaymentPlan(Request $request)
     return redirect()->route('loan_officer.dashboard')->with('success', 'Payment plan created.');
 }
 
-public function showPaymentPlan(PaymentPlan $plan)
+public function showPaymentPlan($loanId, Request $request)
 {
-    $plan->load('loan.customer', 'loan.loanType');
-    return view('loan_officer.partials.view-payment-plan', compact('plan'));
+    $loan = Loan::with(['customer', 'paymentPlan', 'payments'])->findOrFail($loanId);
+
+    if ($request->wantsJson()) {
+        // If it's an AJAX request (likely indicated by 'Accept: application/json' header)
+        return response()->json([
+            'status' => $loan->paymentPlan ? $loan->paymentPlan->status : 'Not Available',
+            'payments' => $loan->payments->map(function ($payment) {
+                return [
+                    'date' => $payment->payment_date->format('d M, Y'),
+                    'amount' => number_format($payment->amount, 2) . ' UGX',
+                ];
+            }),
+        ]);
+    } else {
+        // If it's a regular page request, return the full view
+        return view('loan_officer.manage-payments', compact('loan'));
+    }
 }
 
 }

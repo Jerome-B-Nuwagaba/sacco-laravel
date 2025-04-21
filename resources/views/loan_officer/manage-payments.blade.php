@@ -12,47 +12,52 @@
                 <p class="text-gray-600 dark:text-gray-400">Approved: {{ $loan->updated_at->format('d M, Y') }}</p>
 
                 @if($loan->paymentPlan)
-    
+
                 <button
-        class="block w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mt-3"
-        data-plan-id="{{ $loan->paymentPlan->id }}"
-        data-duration="{{ $loan->paymentPlan->installment_duration }}"
-        data-installments="{{ $loan->paymentPlan->number_of_installments }}"
-        data-amount="{{ $loan->paymentPlan->amount_per_installment }}"
-        data-completion="{{ $loan->paymentPlan->completion_date->format('Y-m-d') }}"
-        onclick="openViewOverlay(event)">
-        View Payment Plan
-      </button>
-    @else
-     
-      <button
-        class="block w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded mt-3"
-        data-loan-id="{{ $loan->id }}"
-        data-loan-amount="{{ $loan->amount }}"
-        onclick="openOverlay(event)">
-        Create Payment Plan
-      </button>
-    @endif
-  </div>
-@endforeach
+                    class="block w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mt-3"
+                    data-loan-id="{{ $loan->id }}"
+                    data-plan-id="{{ $loan->paymentPlan->id }}"
+                    data-duration="{{ $loan->paymentPlan->installment_duration }}"
+                    data-installments="{{ $loan->paymentPlan->number_of_installments }}"
+                    data-amount="{{ $loan->paymentPlan->amount_per_installment }}"
+                    data-completion="{{ $loan->paymentPlan->completion_date->format('Y-m-d') }}"
+                    data-status="{{ $loan->paymentPlan->status }}"
+                    data-payments="{{ json_encode($loan->payments->map(function ($payment) {
+                        return ['date' => $payment->payment_date, 'amount' => number_format($payment->amount, 2) . ' UGX'];
+                    })) }}"
+                    onclick="openViewOverlay(event)">
+                    View Payment Plan
+                </button>
+                @else
+
+                <button
+                    class="block w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded mt-3"
+                    data-loan-id="{{ $loan->id }}"
+                    data-loan-amount="{{ $loan->amount }}"
+                    onclick="openOverlay(event)">
+                    Create Payment Plan
+                </button>
+                @endif
             </div>
-        
+        @endforeach
     </div>
 
-   <!-- Include  Overlay Partial -->
    @include('loan_officer.partials.payment-plan-overlay')
    @include('loan_officer.partials.view-payment-plan')
 
 
 <script>
-     function openViewOverlay(event) {
-    const btn     = event.currentTarget;
-    const planId  = btn.dataset.planId;
+    function openViewOverlay(event) {
+    const btn = event.currentTarget;
+    const planId = btn.dataset.planId;
     const duration = btn.dataset.duration;
     const installments = btn.dataset.installments;
     const amount = parseFloat(btn.dataset.amount);
     const completion = btn.dataset.completion;
+    const status = btn.dataset.status;
+    const loanId = btn.dataset.loanId;
     const total = (amount * parseInt(installments, 10)).toFixed(2);
+    const paymentsData = JSON.parse(btn.dataset.payments); // Get payments from data attribute
 
     // Populate fields
     document.getElementById('view_loan_id').innerText = planId;
@@ -61,10 +66,27 @@
     document.getElementById('view_amount_per_installment').innerText = amount.toLocaleString() + ' UGX';
     document.getElementById('view_completion_date').innerText = new Date(completion).toLocaleDateString();
     document.getElementById('view_total_amount').innerText = parseFloat(total).toLocaleString() + ' UGX';
+    document.getElementById('view_payment_plan_status').innerText = status.charAt(0).toUpperCase() + status.slice(1);
+
+    // Get the payments list element
+    const paymentsList = document.getElementById('view_payments_list');
+    paymentsList.innerHTML = ''; // Clear any previous content
+
+    if (paymentsData && paymentsData.length > 0) {
+        paymentsData.forEach(payment => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `Date: ${payment.date}, Amount: ${payment.amount}`;
+            paymentsList.appendChild(listItem);
+        });
+    } else {
+        const listItem = document.createElement('li');
+        listItem.textContent = 'No payments made yet.';
+        paymentsList.appendChild(listItem);
+    }
 
     // Show overlay
     document.getElementById('view-payment-plan-overlay').classList.remove('hidden');
-  }
+}
 
   function closeViewOverlay() {
     document.getElementById('view-payment-plan-overlay').classList.add('hidden');
@@ -98,7 +120,7 @@
 
     function calculatePayment() {
         resetErrors();
-        
+
         const principal = parseFloat(document.getElementById('principal_amount').value) || 0;
         const interestRate = parseFloat(document.getElementById('interest_rate').value);
         const duration = document.getElementById('installment_duration').value;
@@ -130,6 +152,6 @@
         document.getElementById('payment_per_installment').value = perInstallment.toFixed(2);
     }
 
-    
+
 </script>
 @endsection

@@ -24,4 +24,9 @@ class Payment extends Model
     {
         return $this->belongsTo(Loan::class);
     }
+    public function paymentPlan()
+    {
+        return $this->belongsTo(PaymentPlan::class);
+    }
+
 }

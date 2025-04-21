@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LoanOfficerController;
+use App\Http\Controllers\SupportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -70,8 +71,10 @@ Route::get('loan_officer/loans/{loan}', [LoanOfficerController::class, 'show'])-
     Route::get('/loans/paid', [LoanOfficerController::class, 'paidLoans'])->name('loan_officer.loans.paid');       
     Route::get('/loans/payment-plan/create', [LoanOfficerController::class, 'createPaymentPlan'])->name('loan_officer.payment_plan.create');
     Route::post('/loans/payment-plan', [LoanOfficerController::class, 'storePaymentPlan'])->name('loan_officer.payment_plan.store');
-    Route::get('/loan-officer/payment-plans/{plan}', [LoanOfficerController::class, 'showPaymentPlan'])->name('loan_officer.payment_plan.show');
+    Route::get('/payment-plans/{loan}', [LoanOfficerController::class, 'showPaymentPlan'])->name('loan_officer.payment_plan.show');
     Route::get('/loans/{id}/details', [LoanOfficerController::class, 'loanDetails'])->name('loan_officer.loans.details');
+    Route::get('/support', [SupportController::class, 'index'])->name('loan_officer.support');
+    Route::post('/support/{supportRequest}/reply', [SupportController::class, 'reply'])->name('loan_officer.support.reply');
 });
 
 require __DIR__.'/auth.php';

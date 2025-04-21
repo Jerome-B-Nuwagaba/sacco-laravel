@@ -220,24 +220,27 @@ public function supportPage()
         ['question' => 'What is the repayment schedule?', 'answer' => 'The repayment schedule is defined by your assigned loan officer after aproval.'],
        
     ];
-
-    return view('customer.support', compact('faqs'));
+    // Fetch the updated list of support requests with replies for the current user
+    $replies = SupportRequest::where('user_id', auth()->id())
+    ->with('replier')
+    ->latest()
+    ->get();
+    return view('customer.support', compact('faqs', 'replies'));
 }
 
 public function submitSupportRequest(Request $request)
 {
-    
     $request->validate([
         'message' => 'required|string|max:1000',
         'email' => 'required|email',
     ]);
+
     // Store the support request
     SupportRequest::create([
         'user_id' => auth()->id(),
         'email' => $request->email,
         'message' => $request->message,
     ]);
-
     return redirect()->route('customer.support')->with('success', 'Your support request has been submitted!');
 }
 }
