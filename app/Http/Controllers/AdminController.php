@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Loan;
 use App\Models\LoanType;
 use App\Models\User;
-
+use Illuminate\Support\Facades\DB;
 class AdminController extends Controller
 {
     public function index()
@@ -89,7 +89,19 @@ public function analytics()
         'monthly' => \App\Models\Loan::whereMonth('created_at', now()->month)->count(),
         
     ];
-
-    return view('admin.analytics', compact('analytics'));
+    // Fetch monthly loan application counts for the last 6 months
+    $monthlyTrend = Loan::select(DB::raw('YEAR(created_at) as year, MONTH(created_at) as month, COUNT(*) as count'))
+        ->where('created_at', '>=', now()->subMonths(5)->startOfMonth()) // Get data for the last 6 months (including current)
+        ->groupBy('year', 'month')
+        ->orderBy('year')
+        ->orderBy('month')
+        ->get()
+        ->map(function ($item) {
+            return [
+                'month_year' => \Carbon\Carbon::create($item->year, $item->month)->format('M Y'),
+                'count' => $item->count,
+            ];
+        });
+    return view('admin.analytics', compact('analytics', 'monthlyTrend'));
 }
 }
