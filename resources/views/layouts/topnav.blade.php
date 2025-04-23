@@ -1,5 +1,4 @@
-<nav x-data="{ open: false, openNotifications: false }"
-     class="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-900">
+<nav class="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-900">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
@@ -8,39 +7,7 @@
             </div>
 
             <div class="flex items-center space-x-6">
-                <div class="relative">
-                <button @click="openNotifications = !openNotifications" class="relative">
-                    <i class="fa fa-bell text-xl text-gray-600 dark:text-white"></i>
-                    @if(auth()->user()->unreadNotifications->count())
-                        <span class="absolute top-0 right-0 inline-block w-4 h-4 bg-red-600 text-white text-xs leading-tight text-center rounded-full">
-                            {{ auth()->user()->unreadNotifications->count() }}
-                        </span>
-                    @endif
-                </button>
-
-
-                    <div x-show="openNotifications" @click.away="openNotifications = false"
-                         class="absolute right-0 mt-2 w-80 origin-top-right rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
-                        <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu-button">
-                            @if(auth()->user()->unreadNotifications->isNotEmpty())
-                                @foreach(auth()->user()->unreadNotifications as $notification)
-                                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" role="menuitem">
-                                        {{ $notification->data['message'] ?? 'New Notification' }}
-                                    </a>
-                                @endforeach
-                                <div class="px-4 py-2 border-t border-gray-200 dark:border-gray-600">
-                                    <a href="/notifications" class="block text-center text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-600">
-                                        {{ __('See All Notifications') }}
-                                    </a>
-                                </div>
-                            @else
-                                <span class="block px-4 py-2 text-sm text-gray-500 dark:text-gray-400">{{ __('No new notifications') }}</span>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-
-
+                
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button
@@ -97,12 +64,3 @@
     </div>
 </nav>
 
-<script>
-    //for notifications
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('yourComponentName', () => ({
-            open: false,
-            openNotifications: false,
-        }));
-    });
-</script>

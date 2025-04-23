@@ -75,11 +75,6 @@
     </div>
 
    
-@foreach ($notifications as $notification)
-    <div class="alert alert-info">
-        {{ $notification->data['message'] }}
-        <a href="{{ route('loan.show', $notification->data['loan_id']) }}">View Loan</a>
-    </div>
-@endforeach
+
 
 @endsection

@@ -40,8 +40,6 @@ public function dashboard()
 {
     $loanOfficerId = auth()->id();
 
-    $notifications = auth()->user()->unreadNotifications;
-
     $customers = User::where(function ($query) use ($loanOfficerId) {
         $query->whereNull('loan_officer_id') // New customers (unassigned)
               ->orWhere('loan_officer_id', $loanOfficerId); // Assigned to this loan officer
@@ -60,7 +58,7 @@ public function dashboard()
         ->with(['customer', 'loanType', 'payments'])
         ->get();
 
-    return view('loan_officer.dashboard', compact('customers','pendingLoans', 'paidLoans', 'notifications'));
+    return view('loan_officer.dashboard', compact('customers','pendingLoans', 'paidLoans'));
 }
 
 public function reviewLoans()
@@ -119,19 +117,7 @@ public function updateLoanStatus($loanId, Request $request)
     $loan = \App\Models\Loan::findOrFail($loanId);
     $loan->status = $request->action;
     $loan->save();
-    // Notify customer
-    $customer = $loan->customer; // assuming you have a relationship set up
-
-    if ($customer) {
-        $message = $request->action === 'forwarded'
-            ? 'Your loan application has been forwarded for approval.'
-            : 'Your loan application has been declined.';
-
-        $customer->notify(new LoanApplicationNotification(
-            $message,
-            route('loans.show', $loan->id)
-        ));
-    }
+   
 
     return redirect()->back()->with('success', 'Loan ' . $request->action);
 }

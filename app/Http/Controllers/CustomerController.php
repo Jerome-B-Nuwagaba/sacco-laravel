@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Notifications\PaymentPlanRejected;
 use App\Models\LoanType;
 use App\Models\Loan;
 use App\Models\Payment;
@@ -103,15 +102,8 @@ public function storeLoan(Request $request)
         'status' => 'pending',
         'loan_officer_id' => auth()->user()->loan_officer_id,
     ]);
-    // Notify the loan officer if assigned
-    if ($customer->loan_officer_id) {
-        $loanOfficer = User::find($customer->loan_officer_id);
+    
 
-        $loanOfficer->notify(new LoanApplicationNotification(
-            "{$customer->name} submitted a new loan application.",
-            route('loan_officer.loan_applications')
-        ));
-    }
 
 
     return redirect()->route('customer.dashboard')->with('success', 'Loan application submitted.');
@@ -138,10 +130,7 @@ public function acceptPaymentPlan($id)
     $plan->accepted = true;
     $plan->save();
 
-    /*if ($plan->loan->loanOfficer) {
-        $plan->loan->loanOfficer->notify(new \App\Notifications\PaymentPlanAccepted($plan));
-    } */
-
+    
     return redirect()->back()->with('success', 'Payment plan accepted.');
 }
 
