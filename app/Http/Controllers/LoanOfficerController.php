@@ -60,7 +60,13 @@ public function dashboard()
         ->with(['customer', 'loanType', 'payments'])
         ->get();
 
-    return view('loan_officer.dashboard', compact('customers','pendingLoans', 'paidLoans', 'notifications'));
+        $rejectedPlans = PaymentPlan::onlyTrashed()
+    ->where('created_by', auth()->id())
+    ->where('status', 'rejected')
+    ->with('loan.customer') // if needed
+    ->get();
+
+    return view('loan_officer.dashboard', compact('customers','pendingLoans', 'paidLoans', 'notifications', 'rejectedPlans'));
 }
 
 public function reviewLoans()
@@ -129,7 +135,7 @@ public function updateLoanStatus($loanId, Request $request)
 
         $customer->notify(new LoanApplicationNotification(
             $message,
-            route('loans.show', $loan->id)
+            route('loan_officer.loans.show', $loan->id)
         ));
     }
 
@@ -157,7 +163,16 @@ public function createPaymentPlan()
             ->where('status', 'approved') 
             ->get();
 
-    return view('loan_officer.manage-payments', compact('loans'));
+            $rejectedPlans = PaymentPlan::onlyTrashed()
+        ->where('created_by', auth()->id())
+        ->where('status', 'rejected')
+        ->with('loan.customer')
+        ->get();
+
+        $loanId = null;
+
+
+    return view('loan_officer.manage-payments', compact('loans', 'rejectedPlans', 'loanId'));
 }
 
 public function forwardLoan($id)
@@ -195,7 +210,13 @@ public function managePayments()
         }])
         ->get();
 
-    return view('loan_officer.manage-payments', compact('loans'));
+        $rejectedPlans = PaymentPlan::onlyTrashed()
+        ->where('created_by', auth()->id())
+        ->where('status', 'rejected')
+        ->with('loan.customer')
+        ->get();
+
+    return view('loan_officer.manage-payments', compact('loans', 'rejectedPlans'));
 }
 
 public function storePaymentPlan(Request $request)
@@ -239,8 +260,78 @@ public function showPaymentPlan($loanId, Request $request)
         ]);
     } else {
         // If it's a regular page request, return the full view
-        return view('loan_officer.manage-payments', compact('loan'));
+        $rejectedPlans = PaymentPlan::onlyTrashed()
+            ->where('created_by', auth()->id())
+            ->where('status', 'rejected')
+            ->with('loan.customer')
+            ->get();
+        
+        return view('loan_officer.manage-payments', compact('loan', 'rejectedPlans'));
     }
+}
+
+public function rejectedPlans()
+{
+    $plans = PaymentPlan::onlyTrashed()
+        ->where('created_by', auth()->id())
+        ->where('status', 'rejected')
+        ->with('loan.customer')
+        ->get();
+
+    return view('loan_officer.rejected-plans', compact('plans'));
+}
+
+public function createNewPlan(Request $request)
+{
+    $loanId = $request->input('loan_id');
+    $loanOfficerId = auth()->id();
+
+    $loans = \App\Models\Loan::where('loan_officer_id', $loanOfficerId)
+        ->where('status', 'approved')
+        ->with(['customer', 'paymentPlan', 'payments'])
+        ->get();
+
+    $rejectedPlans = \App\Models\PaymentPlan::onlyTrashed()
+        ->where('created_by', $loanOfficerId)
+        ->where('status', 'rejected')
+        ->with('loan.customer')
+        ->get();
+
+
+    return view('loan_officer.manage-payments', compact('loans', 'rejectedPlans', 'loanId'));
+}
+
+public function showRejectedPlans()
+{
+    $rejectedPlans = PaymentPlan::onlyTrashed()
+        ->where('status', 'rejected')
+        ->with('loan') // if you want to show loan info
+        ->get();
+
+    return view('loan_officer.manage-payments', compact('rejectedPlans'));
+}
+
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'loan_id' => 'required|exists:loans,id',
+        'amount_per_installment' => 'required|integer|min:1',
+        'number_of_installments' => 'required|integer|min:1',
+        'completion_date' => 'required|date',
+        'installment_duration' => 'required|string',
+    ]);
+
+    PaymentPlan::create([
+        'loan_id' => $validated['loan_id'],
+        'amount_per_installment' => $validated['amount_per_installment'],
+        'number_of_installments' => $validated['number_of_installments'],
+        'completion_date' => $validated['completion_date'],
+        'installment_duration' => $validated['installment_duration'],
+        'status' => 'pending',
+        'created_by' => auth()->id(),
+    ]);
+
+    return redirect()->route('loan_officer.rejected')->with('success', 'New payment plan created.');
 }
 
 }

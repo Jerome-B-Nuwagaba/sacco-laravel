@@ -69,13 +69,16 @@ Route::prefix('loan_officer')->middleware('auth')->group(function () {
     Route::post('/loans/{loanId}/status', [LoanOfficerController::class, 'updateLoanStatus'])->name('loan_officer.loans.update');
     Route::post('loan_officer/manage_user/{user}', [LoanOfficerController::class, 'manageUser'])->name('loan_officer.manage_user');
 Route::get('loan_officer/loans/{loan}', [LoanOfficerController::class, 'show'])->name('loan_officer.loans.show');
-    Route::get('/loans/paid', [LoanOfficerController::class, 'paidLoans'])->name('loan_officer.loans.paid');       
+    Route::get('/loans/paid', [LoanOfficerController::class, 'paidLoans'])->name('loan_officer.loans.paid');
+    Route::get('/loan_officer/rejected-plans', [LoanOfficerController::class, 'showRejectedPlans'])->name('loan_officer.rejected');
+Route::get('/loan_officer/plans/new', [LoanOfficerController::class, 'createNewPlan'])->name('loan_officer.plans.new');       
     Route::get('/loans/payment-plan/create', [LoanOfficerController::class, 'createPaymentPlan'])->name('loan_officer.payment_plan.create');
     Route::post('/loans/payment-plan', [LoanOfficerController::class, 'storePaymentPlan'])->name('loan_officer.payment_plan.store');
     Route::get('/payment-plans/{loan}', [LoanOfficerController::class, 'showPaymentPlan'])->name('loan_officer.payment_plan.show');
     Route::get('/loans/{id}/details', [LoanOfficerController::class, 'loanDetails'])->name('loan_officer.loans.details');
     Route::get('/support', [SupportController::class, 'index'])->name('loan_officer.support');
     Route::post('/support/{supportRequest}/reply', [SupportController::class, 'reply'])->name('loan_officer.support.reply');
+    Route::post('/plans/store', [LoanOfficerController::class, 'store'])->name('loan_officer.plans.store');
 });
 
 require __DIR__.'/auth.php';
