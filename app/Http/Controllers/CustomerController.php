@@ -23,6 +23,8 @@ class CustomerController extends Controller
 
     $paymentPlans = \App\Models\PaymentPlan::whereHas('loan', fn ($q) => $q->where('customer_id', $user->id))
                         //->where('accepted', false)
+                        ->where('status', 'pending')
+->whereNull('deleted_at')
                         ->get();
 
     $recentPayments = \App\Models\Payment::whereHas('loan', function ($query) {
@@ -188,6 +190,9 @@ public function rejectPaymentPlan($planId)
         $query->where('customer_id', auth()->id());
     })->findOrFail($planId);
 
+    $plan->status = 'rejected';
+    $plan->save();
+
     // Notify the loan officer who created the plan
     if ($plan->created_by) {
         $loanOfficer = \App\Models\User::find($plan->created_by);
@@ -197,7 +202,7 @@ public function rejectPaymentPlan($planId)
     }
 
     // Optionally, delete the rejected plan
-    //$plan->delete();
+    $plan->delete();
 
     return redirect()->back()->with('success', 'Payment plan rejected. The loan officer will create a new one.');
 }
