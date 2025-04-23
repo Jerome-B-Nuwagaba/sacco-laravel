@@ -22,9 +22,7 @@ class CustomerController extends Controller
                         ->first();
 
     $paymentPlans = \App\Models\PaymentPlan::whereHas('loan', fn ($q) => $q->where('customer_id', $user->id))
-                        //->where('accepted', false)
-                        ->where('status', 'pending')
-->whereNull('deleted_at')
+                        ->whereNull('deleted_at')
                         ->get();
 
     $recentPayments = \App\Models\Payment::whereHas('loan', function ($query) {
@@ -35,23 +33,27 @@ class CustomerController extends Controller
     ->get();
 
     $pastLoans = Loan::where('customer_id', $user->id)
-                    ->where('status', '!=', 'accepted')
+                    ->where('status', '!=', 'active')
                     ->with('loanType')
                     ->get();
 
     return view('customer.dashboard', compact('currentLoan', 'paymentPlans', 'recentPayments', 'pastLoans'));
 }
 
-    public function myLoans()
-    {
-        $loans = Loan::where('customer_id', auth()->id())
-                     ->with('loanType')
-                     ->latest()
-                     ->get();
-        $loanTypes = LoanType::all();
-    
-        return view('customer.myloans', compact('loans','loanTypes'));
-    }
+public function myLoans()
+{
+    $user = auth()->user();
+    $loans = Loan::where('customer_id', auth()->id())
+                 ->with('loanType', 'paymentPlan') 
+                 ->latest()
+                 ->get();
+    $loanTypes = LoanType::all();
+    $paymentPlans = \App\Models\PaymentPlan::whereHas('loan', fn ($q) => $q->where('customer_id', $user->id))
+                                         ->whereNull('deleted_at')
+                                         ->latest()
+                                         ->get();
+    return view('customer.myloans', compact('loans', 'loanTypes', 'paymentPlans'));
+}
     
     public function createLoan()
 {
@@ -190,16 +192,9 @@ public function rejectPaymentPlan($planId)
         $query->where('customer_id', auth()->id());
     })->findOrFail($planId);
 
-    $plan->status = 'rejected';
+    $plan->accepted = '0';
     $plan->save();
 
-    // Notify the loan officer who created the plan
-    if ($plan->created_by) {
-        $loanOfficer = \App\Models\User::find($plan->created_by);
-        if ($loanOfficer) {
-            $loanOfficer->notify(new PaymentPlanRejected($plan));
-        }
-    }
 
     // Optionally, delete the rejected plan
     $plan->delete();

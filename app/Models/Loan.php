@@ -38,4 +38,8 @@ public function payments()
 {
     return $this->hasMany(Payment::class);
 }
+public function latestPayment(): HasOne
+    {
+        return $this->hasOne(PaymentPlan::class)->latestOfMany();
+    }
 }

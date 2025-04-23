@@ -11,22 +11,7 @@ use Illuminate\Support\Carbon;
 
 class LoanOfficerController extends Controller
 {
-    /*public function index()
-    {
-        $customers = \App\Models\User::where('role', 'customer')->get();
-    $pendingLoans = \App\Models\Loan::where('status', 'pending')->get();
-    $paidLoans = \App\Models\Loan::where('status', 'paid')->get();
 
-    $pendingLoans = Loan::where('loan_officer_id', auth()->id())
-        ->where('status', 'approved')
-        ->doesntHave('paymentPlan')
-        ->with('customer')
-        ->get();
-
-        $paidLoans = Loan::where('status', 'paid')->get();
-
-        return view('loan_officer.dashboard', compact('customers', 'pendingLoans', 'paidLoans'));
-    } */
 
     
 
@@ -61,7 +46,7 @@ public function dashboard()
     return view('loan_officer.dashboard', compact('customers','pendingLoans', 'paidLoans'));
         $rejectedPlans = PaymentPlan::onlyTrashed()
     ->where('created_by', auth()->id())
-    ->where('status', 'rejected')
+    ->where('accepted', '0')
     ->with('loan.customer') // if needed
     ->get();
 
@@ -125,23 +110,7 @@ public function updateLoanStatus($loanId, Request $request)
     $loan->status = $request->action;
     $loan->save();
    
-    // Notify customer
-    $customer = $loan->customer; // assuming you have a relationship set up
-
-    if ($customer) {
-        $message = $request->action === 'forwarded'
-            ? 'Your loan application has been forwarded for approval.'
-            : 'Your loan application has been declined.';
-
-        $customer->notify(new LoanApplicationNotification(
-            $message,
-            route('loan_officer.loans.show', $loan->id)
-        ));
-    }
-
-    return redirect()->back()->with('success', 'Loan ' . $request->action);
 }
-
 public function paidLoans()
 {
     //$loans = \App\Models\Loan::where('status', 'paid')
@@ -165,7 +134,7 @@ public function createPaymentPlan()
 
             $rejectedPlans = PaymentPlan::onlyTrashed()
         ->where('created_by', auth()->id())
-        ->where('status', 'rejected')
+        ->where('accepted', '0')
         ->with('loan.customer')
         ->get();
 
@@ -187,7 +156,7 @@ public function forwardLoan($id)
 public function rejectLoan($id)
 {
     $loan = Loan::findOrFail($id);
-    $loan->status = 'rejected';
+    $loan->accepted = '0';
     $loan->save();
 
     return redirect()->back()->with('success', 'Loan rejected.');
@@ -212,7 +181,7 @@ public function managePayments()
 
         $rejectedPlans = PaymentPlan::onlyTrashed()
         ->where('created_by', auth()->id())
-        ->where('status', 'rejected')
+        ->where('accepted', '0')
         ->with('loan.customer')
         ->get();
 
@@ -262,7 +231,7 @@ public function showPaymentPlan($loanId, Request $request)
         // If it's a regular page request, return the full view
         $rejectedPlans = PaymentPlan::onlyTrashed()
             ->where('created_by', auth()->id())
-            ->where('status', 'rejected')
+            ->where('accepted', '0')
             ->with('loan.customer')
             ->get();
         
@@ -274,7 +243,7 @@ public function rejectedPlans()
 {
     $plans = PaymentPlan::onlyTrashed()
         ->where('created_by', auth()->id())
-        ->where('status', 'rejected')
+        ->where('accepted', '0')
         ->with('loan.customer')
         ->get();
 
@@ -293,7 +262,7 @@ public function createNewPlan(Request $request)
 
     $rejectedPlans = \App\Models\PaymentPlan::onlyTrashed()
         ->where('created_by', $loanOfficerId)
-        ->where('status', 'rejected')
+        ->where('accepted', '0')
         ->with('loan.customer')
         ->get();
 
@@ -304,7 +273,7 @@ public function createNewPlan(Request $request)
 public function showRejectedPlans()
 {
     $rejectedPlans = PaymentPlan::onlyTrashed()
-        ->where('status', 'rejected')
+        ->where('accepted', '0')
         ->with('loan') // if you want to show loan info
         ->get();
 
@@ -327,7 +296,7 @@ public function store(Request $request)
         'number_of_installments' => $validated['number_of_installments'],
         'completion_date' => $validated['completion_date'],
         'installment_duration' => $validated['installment_duration'],
-        'status' => 'pending',
+        'status' => 'active',
         'created_by' => auth()->id(),
     ]);
 

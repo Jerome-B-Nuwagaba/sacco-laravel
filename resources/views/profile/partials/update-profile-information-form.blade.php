@@ -13,9 +13,26 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6" enctype="multipart/form-data">
         @csrf
         @method('patch')
+
+        <div>
+            <x-input-label for="photo" :value="__('Profile Photo')" />
+
+            @if (Auth::user()->profile_photo_path)
+                <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" alt="{{ Auth::user()->name }}" class="rounded-full h-20 w-20 object-cover mb-4">
+            @else
+                <div class="rounded-full h-20 w-20 bg-gray-200 dark:bg-gray-700 flex items-center justify-center mb-4">
+                    <svg class="h-10 w-10 text-gray-500 dark:text-gray-400 fill-current" viewBox="0 0 24 24">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+            @endif
+
+            <input id="photo" type="file" class="mt-1 block w-full" name="photo" accept="image/*" />
+            <x-input-error class="mt-2" :messages="$errors->get('photo')" />
+        </div>
 
         <div>
             <x-input-label for="name" :value="__('Name')" />
@@ -46,7 +63,6 @@
                 </div>
             @endif
         </div>
-        <!--Phone Number-->
         <div>
             <x-input-label for="phone_number" :value="__('Phone Number')" />
             <x-text-input id="phone_number" name="phone_number" type="text" class="mt-1 block w-full"

@@ -47,8 +47,6 @@
     </div>
 @endif
 
-
-    @if (count($paymentPlans) > 0)
     <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mb-8">
         <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
             Active Payment Plans
@@ -69,7 +67,7 @@
             @endforeach
         </ul>
     </div>
-@endif
+
 @if ($paymentPlans->where('status', 'completed')->count() > 0)
 <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mb-8">
     <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">

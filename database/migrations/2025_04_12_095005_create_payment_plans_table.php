@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('completion_date');
             $table->string('installment_duration'); 
             $table->boolean('accepted')->default(false);
-            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
+            $table->enum('status', ['active','completed'])->default('active');
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });

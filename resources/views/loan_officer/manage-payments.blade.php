@@ -43,7 +43,7 @@
     </div>
 
     <div class="max-w-5xl mx-auto px-4 py-8">
-    <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Rejected Payment Plans</h2>
+    <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Past Rejected Payment Plans</h2>
 
     @forelse ($rejectedPlans as $plan)
         <div class="bg-white dark:bg-gray-800 border border-red-300 dark:border-red-600 p-6 mb-6 rounded-lg shadow-sm">
@@ -60,55 +60,13 @@
                 <strong>Installments:</strong> {{ $plan->number_of_installments }}
             </p>
 
-            {{-- Button to create a new plan --}}
-            <form action="{{ route('loan_officer.plans.new') }}" method="GET">
-                <input type="hidden" name="loan_id" value="{{ $plan->loan_id }}">
-                <button
-                    type="submit"
-                    class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded shadow transition"
-                >
-                    Create New Plan
-                </button>
-            </form>
         </div>
     @empty
         <p class="text-gray-600 dark:text-gray-300">No rejected plans found.</p>
     @endforelse
 </div>
 
-<div class="max-w-2xl mx-auto px-4 py-8">
-    <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Create New Payment Plan</h2>
 
-    <form action="{{ route('loan_officer.plans.store') }}" method="POST" class="space-y-4">
-        @csrf
-
-        <input type="hidden" name="loan_id" value="{{ $loanId }}">
-
-        <div>
-            <label class="block text-gray-700 dark:text-gray-300">Amount Per Installment</label>
-            <input type="number" name="amount_per_installment" class="w-full px-4 py-2 border rounded dark:bg-gray-700 dark:text-white" required>
-        </div>
-
-        <div>
-            <label class="block text-gray-700 dark:text-gray-300">Number of Installments</label>
-            <input type="number" name="number_of_installments" class="w-full px-4 py-2 border rounded dark:bg-gray-700 dark:text-white" required>
-        </div>
-
-        <div>
-            <label class="block text-gray-700 dark:text-gray-300">Completion Date</label>
-            <input type="date" name="completion_date" class="w-full px-4 py-2 border rounded dark:bg-gray-700 dark:text-white" required>
-        </div>
-
-        <div>
-            <label class="block text-gray-700 dark:text-gray-300">Installment Duration (e.g., weekly, monthly)</label>
-            <input type="text" name="installment_duration" class="w-full px-4 py-2 border rounded dark:bg-gray-700 dark:text-white" required>
-        </div>
-
-        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded">
-            Submit Plan
-        </button>
-    </form>
-</div>
 
    @include('loan_officer.partials.payment-plan-overlay')
    @include('loan_officer.partials.view-payment-plan')
