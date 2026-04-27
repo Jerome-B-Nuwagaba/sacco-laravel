@@ -58,7 +58,7 @@ class RegisteredUserController extends Controller
     case 'admin':
         return redirect()->route('admin.dashboard');
     case 'loan_officer':
-        return redirect()->route('loanofficer.dashboard');
+        return redirect()->route('loan_officer.dashboard');
     case 'customer':
         return redirect()->route('customer.dashboard');
     default:

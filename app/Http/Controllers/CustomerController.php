@@ -8,6 +8,7 @@ use App\Models\Loan;
 use App\Models\Payment;
 use App\Models\PaymentPlan;
 use App\Models\SupportRequest;
+use App\Services\MLPredictionService;
 
 class CustomerController extends Controller
 {
@@ -232,4 +233,75 @@ public function submitSupportRequest(Request $request)
     ]);
     return redirect()->route('customer.support')->with('success', 'Your support request has been submitted!');
 }
+
+public function __construct(private MLPredictionService $mlService) {}
+
+    public function assess(Request $request)
+    {
+        $validated = $request->validate([
+            'member_id'           => 'required|exists:members,id',
+            'age'                 => 'required|integer|min:18|max:80',
+            'membership_years'    => 'required|integer|min:0',
+            'annual_income_ugx'   => 'required|integer|min:0',
+            'annual_savings_ugx'  => 'required|integer|min:0',
+            'loan_amount_ugx'     => 'required|integer|min:100000',
+            'land_size_acres'     => 'required|numeric|min:0',
+            'collateral_ugx'      => 'required|integer|min:0',
+            'num_guarantors'      => 'required|integer|min:0',
+            'emp_length_years'    => 'required|numeric|min:0',
+            'primary_crop'        => 'required|string',
+            'loan_grade'          => 'required|in:A,B,C,D,E,F,G',
+            'loan_purpose'        => 'required|string',
+            'interest_rate_pct'   => 'required|numeric|min:0',
+            'loan_pct_income'     => 'required|numeric|min:0',
+            'credit_hist_years'   => 'required|integer|min:0',
+            'prior_default_num'   => 'required|in:0,1',
+            'profitability_2022'  => 'required|integer|min:1|max:5',
+            'profitability_2023'  => 'required|integer|min:1|max:5',
+            'soil_acidity'        => 'required|integer|min:1|max:5',
+            'rainfall_2022_mm'    => 'required|numeric|min:0',
+            'rainfall_2023_mm'    => 'required|numeric|min:0',
+            'temperature_c'       => 'required|numeric',
+            'humidity'            => 'required|numeric|min:0|max:100',
+            'wind_speed'          => 'required|numeric|min:0',
+            'district'            => 'required|string',
+            'region'              => 'required|string',
+            'total_rainfall_mm'   => 'required|numeric|min:0',
+            'avg_temp_c'          => 'required|numeric',
+            'drought_flag'        => 'required|in:0,1',
+            'flood_risk_flag'     => 'required|in:0,1',
+            'weather_risk_score'  => 'required|numeric|min:0|max:10',
+        ]);
+
+        // Call the ML service
+        $prediction = $this->mlService->predict($validated);
+
+        if (!$prediction) {
+            // ML service is down — save application anyway, flag for manual review
+            return response()->json([
+                'message' => 'ML service unavailable. Application saved for manual review.',
+                'ml_available' => false,
+            ], 202);
+        }
+
+        // Save the prediction alongside the loan application
+        $loan = Loan::create([
+            'member_id'              => $validated['member_id'],
+            'requested_amount_ugx'   => $validated['loan_amount_ugx'],
+            'recommended_amount_ugx' => $prediction['recommended_loan_ugx'],
+            'credit_score'           => $prediction['credit_score'],
+            'risk_level'             => $prediction['risk_level'],
+            'risk_probabilities'     => json_encode($prediction['risk_probabilities']),
+            'policy_flags'           => json_encode($prediction['policy_flags']),
+            'uncertainty_warning'    => $prediction['uncertainty_warning'],
+            'ml_assessed_at'         => now(),
+            'status'                 => 'pending_review',
+        ]);
+
+        return response()->json([
+            'loan_id'    => $loan->id,
+            'prediction' => $prediction,
+        ]);
+    }
+
 }

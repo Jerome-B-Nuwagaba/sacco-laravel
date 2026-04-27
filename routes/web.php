@@ -5,6 +5,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LoanOfficerController;
 use App\Http\Controllers\SupportController;
+use App\Http\Controllers\LoanAssessmentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -60,6 +61,24 @@ Route::prefix('customer')->middleware('auth')->group(function () {
     Route::delete('/reject-plan/{id}', [CustomerController::class, 'rejectPaymentPlan'])->name('customer.rejectPlan');
     Route::get('/support', [CustomerController::class, 'supportPage'])->name('customer.support');
     Route::post('/support', [CustomerController::class, 'submitSupportRequest'])->name('customer.support.submit');
+
+});
+
+Route::get('/test-ml-health', function () {
+    try {
+        $response = \Illuminate\Support\Facades\Http::timeout(5)
+            ->get(config('services.ml_api.url') . '/health');
+        return response()->json([
+            'ml_url'     => config('services.ml_api.url'),
+            'status'     => $response->status(),
+            'body'       => $response->json(),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'ml_url' => config('services.ml_api.url'),
+            'error'  => $e->getMessage(),
+        ]);
+    }
 });
 
 Route::prefix('loan_officer')->middleware('auth')->group(function () {
@@ -82,6 +101,8 @@ Route::get('/loan_officer/plans/new', [LoanOfficerController::class, 'createNewP
     Route::get('/support', [SupportController::class, 'index'])->name('loan_officer.support');
     Route::post('/support/{supportRequest}/reply', [SupportController::class, 'reply'])->name('loan_officer.support.reply');
     Route::post('/plans/store', [LoanOfficerController::class, 'store'])->name('loan_officer.plans.store');
+    Route::get('/loan/assess',  [LoanAssessmentController::class, 'showForm'])->name('loan_officer.assess');
+    Route::post('/loan_officer/assess', [LoanAssessmentController::class, 'assess'])->name('loan_officer.assess.submit');
 });
 
 require __DIR__.'/auth.php';

@@ -43,7 +43,10 @@
                     <a href="{{route('loan_officer.payment_plan.create')}}" class="block py-2 px-4 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-gray-700 focus:outline-none focus:bg-green-100 dark:focus:bg-gray-700 rounded-md mt-2 transition duration-150 ease-in-out">
                         <i class="fas fa-credit-card fa-fw mr-3 text-green-500 dark:text-green-400"></i> Manage Payments
                     </a>
-                    <a href="{{route('loan_officer.support')}}" class="block py-2 px-4 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-gray-700 focus:outline-none focus:bg-green-100 dark:focus:bg-gray-700 rounded-md mt-2 transition duration-150 ease-in-out">
+                    <a href="{{ route('loan_officer.assess') }}" class="block py-2 px-4 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-gray-700 rounded-md mt-2">
+            <i class="fas fa-brain fa-fw mr-3 text-green-500 dark:text-green-400"></i> ML Assessment
+        </a>                   
+                            <a href="{{route('loan_officer.support')}}" class="block py-2 px-4 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-gray-700 focus:outline-none focus:bg-green-100 dark:focus:bg-gray-700 rounded-md mt-2 transition duration-150 ease-in-out">
                     <i class="fas fa-headset fa-fw mr-3 text-green-500 dark:text-green-400"></i> Support
                     </a>
                    
